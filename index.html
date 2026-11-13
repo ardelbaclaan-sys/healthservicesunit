@@ -69,11 +69,26 @@
       border-left: 4px solid #08783e;
       border-radius: 6px;
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .announcement strong {
       color: #08783e;
+    }
+
+    .announcement a {
+      display: inline-block;
+      margin-top: 5px;
+      color: #08783e;
+      font-weight: bold;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+    }
+
+    .announcement .form-group {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #d5e5d9;
     }
 
     .section-title {
@@ -314,6 +329,7 @@
 
   <header class="header">
     <div class="university">DE LA SALLE UNIVERSITY</div>
+
     <div class="unit">
       LAGUNA CAMPUS<br>
       HEALTH SERVICES UNIT
@@ -327,7 +343,11 @@
     </div>
   </header>
 
+
+  <!-- ANNOUNCEMENT -->
+
   <section class="announcement">
+
     <strong>ANNOUNCEMENT</strong>
 
     <p>
@@ -339,7 +359,48 @@
       Select the appropriate verification type before
       scanning or entering an identification number.
     </p>
+
+    <p>
+      <strong>FOR STUDENTS WITH NO SHWR SUBMISSION RECORD:</strong>
+    </p>
+
+    <p>
+      Please accomplish the appropriate SHWR submission
+      form based on your grade level.
+    </p>
+
+    <div class="form-group">
+
+      <strong>NURSERY TO GRADE 10</strong>
+
+      <br>
+
+      <a
+        href="https://docs.google.com/forms/d/e/1FAIpQLSfbll3hXaCLblPbklP8bSIrNChTAdqzs_FdGpK5zGx9KR57DQ/viewform"
+        target="_blank"
+        rel="noopener">
+        OPEN SHWR SUBMISSION FORM
+      </a>
+
+    </div>
+
+    <div class="form-group">
+
+      <strong>GRADE 11 AND GRADE 12</strong>
+
+      <br>
+
+      <a
+        href="https://docs.google.com/forms/d/e/1FAIpQLSe2NlxFvTF04m56fCnk6kyRcrMkCeBfggyf1F_H7w48LW_M9Q/viewform"
+        target="_blank"
+        rel="noopener">
+        OPEN SHWR SUBMISSION FORM
+      </a>
+
+    </div>
+
   </section>
+
 
   <!-- VERIFICATION TYPE -->
 
@@ -348,9 +409,17 @@
   </div>
 
   <select id="verificationType">
-    <option value="student">STUDENT - SHWR VERIFICATION</option>
-    <option value="employee">EMPLOYEE - CLEARANCE VERIFICATION</option>
+
+    <option value="student">
+      STUDENT - SHWR VERIFICATION
+    </option>
+
+    <option value="employee">
+      EMPLOYEE - CLEARANCE VERIFICATION
+    </option>
+
   </select>
+
 
   <!-- CAMERA SCANNER -->
 
@@ -370,6 +439,7 @@
     type="button">
     STOP CAMERA
   </button>
+
 
   <!-- NFC SCANNER -->
 
@@ -393,6 +463,7 @@
     HTTPS, and a supported NDEF record.
   </div>
 
+
   <!-- MANUAL ENTRY -->
 
   <div class="section-title">
@@ -410,6 +481,7 @@
     VERIFY STUDENT
   </button>
 
+
   <!-- STATUS -->
 
   <div
@@ -418,6 +490,7 @@
     role="status"
     aria-live="polite">
   </div>
+
 
   <!-- RESULT -->
 
@@ -438,6 +511,7 @@
 
     <div id="resultId" class="student-id"></div>
 
+
     <!-- EMPLOYEE INSTRUCTION -->
 
     <div
@@ -447,14 +521,18 @@
       NOT CLEARED
 
       <div class="clinic-list">
+
         PLEASE PROCEED TO ANY OF THE FOLLOWING CLINICS:
 
         <br>MRR CLINIC
         <br>LC1 CLINIC
         <br>LC2 CLINIC
         <br>UH CLINIC
+
       </div>
+
     </div>
+
 
     <!-- STUDENT FORM RECOMMENDATION -->
 
@@ -466,7 +544,8 @@
 
       <p>
         No SHWR submission record was found.
-        Please accomplish the appropriate SHWR form.
+        Please accomplish the appropriate SHWR form
+        based on your grade level.
       </p>
 
       <a
@@ -476,9 +555,11 @@
         rel="noopener">
         OPEN SHWR FORM
       </a>
+
     </div>
 
   </section>
+
 
   <button
     id="nextButton"
@@ -487,7 +568,11 @@
     SCAN NEXT
   </button>
 
+
+  <!-- BROWSER REMINDER -->
+
   <div class="browser-note">
+
     <strong>IMPORTANT REMINDER</strong>
 
     <p>
@@ -499,16 +584,23 @@
       Standard Web NFC reads supported NDEF records.
       It cannot directly read arbitrary MIFARE hardware UIDs.
     </p>
+
   </div>
 
+
+  <!-- FOOTER -->
+
   <footer class="footer">
+
     DE LA SALLE UNIVERSITY - LAGUNA CAMPUS<br>
     HEALTH SERVICES UNIT<br>
     STUDENT HEALTH AND WELLNESS RECORD<br>
     ACADEMIC YEAR 2026–2027
+
   </footer>
 
 </main>
+
 
 <script>
 
@@ -565,8 +657,10 @@ window.addEventListener("load", () => {
     !("NDEFReader" in window);
 
   if (!("NDEFReader" in window)) {
+
     $("startNfcButton").title =
       "Web NFC is not supported by this browser.";
+
   }
 
 });
@@ -636,9 +730,11 @@ async function startCamera() {
   try {
 
     if (!window.Html5Qrcode) {
+
       throw new Error(
         "Scanner library did not load. Check your internet connection."
       );
+
     }
 
     showStatus(
@@ -647,16 +743,22 @@ async function startCamera() {
     );
 
     if (!qrScanner) {
+
       qrScanner = new Html5Qrcode("reader");
+
     }
 
     const config = {
+
       fps: 10,
+
       qrbox: {
         width: 250,
         height: 150
       },
+
       aspectRatio: 1.0
+
     };
 
     try {
@@ -709,7 +811,9 @@ async function stopCamera() {
   try {
 
     if (qrScanner && cameraRunning) {
+
       await qrScanner.stop();
+
     }
 
   } catch (error) {
@@ -743,14 +847,6 @@ async function onQrDecoded(decodedText) {
 
 
 /************************ NFC SCANNER ***************************/
-
-/*
- * Web NFC reads supported NDEF records.
- * It does not read arbitrary MIFARE hardware UIDs.
- *
- * Expected card content:
- * NDEF Text record containing the identifier.
- */
 
 async function startNfc() {
 
@@ -790,13 +886,66 @@ async function startNfc() {
 
       if (isProcessing) return;
 
+      console.log("========== HSU NFC DIAGNOSTICS ==========");
+
+      console.log("NFC CARD DETECTED");
+
+      console.log("Serial Number:", event.serialNumber);
+
+      console.log("NDEF Records:", event.message.records);
+
+      event.message.records.forEach((record, index) => {
+
+        console.log("Record:", index);
+
+        console.log("Record Type:", record.recordType);
+
+        console.log("Media Type:", record.mediaType);
+
+        if (record.data) {
+
+          const bytes = new Uint8Array(
+            record.data.buffer,
+            record.data.byteOffset,
+            record.data.byteLength
+          );
+
+          console.log("Raw Bytes:", Array.from(bytes));
+
+          console.log(
+            "Decoded Data:",
+            new TextDecoder().decode(bytes)
+          );
+
+        }
+
+      });
+
       const identifier =
         extractIdentifierFromNdef(event.message);
 
+      console.log("Extracted Identifier:", identifier);
+
+      console.log("=========================================");
+
       if (!identifier) {
 
+        const recordTypes = event.message.records
+          .map(record => {
+
+            return record.recordType +
+              (record.mediaType
+                ? " (" + record.mediaType + ")"
+                : "");
+
+          })
+          .join(", ");
+
         showStatus(
-          "No supported identification record was found on this NFC card.",
+          "NFC CARD DETECTED, BUT NO SUPPORTED ID WAS EXTRACTED. " +
+          "Record type: " +
+          (recordTypes || "None") +
+          ". Check browser console.",
           "error"
         );
 
@@ -836,61 +985,155 @@ async function startNfc() {
 }
 
 
+/*********************** NFC IDENTIFIER EXTRACTION **************/
+
 function extractIdentifierFromNdef(message) {
+
+  if (!message || !message.records) return "";
 
   for (const record of message.records) {
 
     try {
 
+      if (!record.data) continue;
+
+      const bytes = new Uint8Array(
+        record.data.buffer,
+        record.data.byteOffset,
+        record.data.byteLength
+      );
+
+      let value = "";
+
       if (record.recordType === "text") {
 
-        const decoder = new TextDecoder(
-          record.encoding || "utf-8"
-        );
+        if (bytes.length < 1) continue;
 
-        const value = decoder
-          .decode(record.data)
+        const statusByte = bytes[0];
+
+        const languageLength = statusByte & 0x3F;
+
+        value = new TextDecoder(
+          (statusByte & 0x80) ? "utf-16" : "utf-8"
+        ).decode(bytes.slice(1 + languageLength));
+
+      }
+
+      else if (record.recordType === "url") {
+
+        if (bytes.length < 1) continue;
+
+        const prefixes = [
+          "",
+          "http://www.",
+          "https://www.",
+          "http://",
+          "https://",
+          "tel:",
+          "mailto:",
+          "ftp://anonymous:anonymous@",
+          "ftp://ftp.",
+          "ftps://",
+          "sftp://",
+          "smb://",
+          "nfs://",
+          "ftp://",
+          "dav://",
+          "news:",
+          "telnet://",
+          "imap:",
+          "rtsp://",
+          "urn:",
+          "pop:",
+          "sip:",
+          "sips:",
+          "tftp:",
+          "btspp://",
+          "btl2cap://",
+          "btgoep://",
+          "tcpobex://",
+          "irdaobex://",
+          "file://",
+          "urn:epc:id:",
+          "urn:epc:tag:",
+          "urn:epc:pat:",
+          "urn:epc:raw:",
+          "urn:epc:",
+          "urn:nfc:"
+        ];
+
+        const prefix = prefixes[bytes[0]] || "";
+
+        const suffix = new TextDecoder()
+          .decode(bytes.slice(1))
           .trim();
 
-        if (value) return value;
+        value = prefix + suffix;
+
+      }
+
+      else if (
+        record.recordType === "mime" &&
+        record.mediaType === "text/plain"
+      ) {
+
+        value = new TextDecoder()
+          .decode(bytes);
+
+      }
+
+      else {
+
+        continue;
+
+      }
+
+      value = value.trim();
+
+      if (!value) continue;
+
+      const match = value.match(
+        /(?:^|[\r\n;,|])\s*ID[_\s-]*Number\s*[:=]\s*([A-Z0-9-]+)/i
+      );
+
+      if (match && match[1]) {
+
+        return match[1].trim();
 
       }
 
       if (record.recordType === "url") {
 
-        const decoder = new TextDecoder();
+        try {
 
-        const value = decoder
-          .decode(record.data)
-          .trim();
+          const parsed = new URL(value);
 
-        if (value) {
+          const lastPart = parsed.pathname
+            .split("/")
+            .filter(Boolean)
+            .pop();
 
-          try {
+          if (lastPart) return lastPart;
 
-            const parsed = new URL(value);
+        } catch (error) {
 
-            const lastPart = parsed.pathname
-              .split("/")
-              .filter(Boolean)
-              .pop();
-
-            return lastPart || value;
-
-          } catch (error) {
-
-            return value;
-
-          }
+          // Continue to plain identifier validation.
 
         }
+
+      }
+
+      if (/^[A-Z0-9-]+$/i.test(value)) {
+
+        return value;
 
       }
 
     } catch (error) {
 
       console.warn(
-        "NDEF record could not be decoded."
+        "NFC decoding error:",
+        error
       );
 
     }
@@ -902,12 +1145,16 @@ function extractIdentifierFromNdef(message) {
 }
 
 
+/************************ STOP NFC ******************************/
+
 function stopNfc() {
 
   try {
 
     if (nfcAbortController) {
+
       nfcAbortController.abort();
+
     }
 
   } catch (error) {
@@ -958,21 +1205,15 @@ function verifyManual() {
 $("idInput").addEventListener("keydown", event => {
 
   if (event.key === "Enter") {
+
     verifyManual();
+
   }
 
 });
 
 
 /*********************** JSONP VERIFICATION *********************/
-
-/*
- * Sends:
- * action=verify
- * id=IDENTIFIER
- * type=student OR employee
- * callback=JSONP_CALLBACK
- */
 
 function verifyIdentifier(rawIdentifier, verificationType) {
 
@@ -1022,20 +1263,17 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     "info"
   );
 
-
   const callbackName =
     "hsuCallback_" +
     Date.now() +
     "_" +
     Math.floor(Math.random() * 100000);
 
-
   const script = document.createElement("script");
 
   let completed = false;
 
   let timeoutId;
-
 
   function cleanup() {
 
@@ -1048,7 +1286,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     delete window[callbackName];
 
     if (script.parentNode) {
+
       script.parentNode.removeChild(script);
+
     }
 
     $("verifyButton").disabled = false;
@@ -1056,7 +1296,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     isProcessing = false;
 
   }
-
 
   function fail(message) {
 
@@ -1075,13 +1314,11 @@ function verifyIdentifier(rawIdentifier, verificationType) {
 
   }
 
-
   window[callbackName] = response => {
 
     if (completed) return;
 
     cleanup();
-
 
     if (!response || response.success !== true) {
 
@@ -1107,17 +1344,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
 
     if (verificationType === "employee") {
 
-      /*
-       * USER-REQUESTED DISPLAY RULE:
-       *
-       * Employee number FOUND:
-       * Display NOT CLEARED.
-       * Direct employee to clinic.
-       *
-       * Employee number NOT FOUND:
-       * Display CLEARED.
-       */
-
       if (response.status === "VERIFIED") {
 
         showResult(
@@ -1134,7 +1360,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
           "error"
         );
 
-      } else if (response.status === "NOT FOUND") {
+      }
+
+      else if (response.status === "NOT FOUND") {
 
         showResult(
           "CLEARED",
@@ -1150,7 +1378,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
           "success"
         );
 
-      } else {
+      }
+
+      else {
 
         showResult(
           "ERROR",
@@ -1192,7 +1422,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
           "success"
         );
 
-      } else if (response.status === "NO SHWR") {
+      }
+
+      else if (response.status === "NO SHWR") {
 
         showResult(
           "NO SHWR",
@@ -1208,7 +1440,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
           "error"
         );
 
-      } else {
+      }
+
+      else {
 
         showResult(
           "ERROR",
@@ -1229,7 +1463,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
 
   };
 
-
   script.onerror = () => {
 
     fail(
@@ -1237,7 +1470,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     );
 
   };
-
 
   timeoutId = setTimeout(() => {
 
@@ -1247,14 +1479,12 @@ function verifyIdentifier(rawIdentifier, verificationType) {
 
   }, 15000);
 
-
   const query =
     "?action=verify" +
     "&id=" + encodeURIComponent(identifier) +
     "&type=" + encodeURIComponent(verificationType) +
     "&callback=" + encodeURIComponent(callbackName) +
     "&_=" + Date.now();
-
 
   script.src = SHWR_API_URL + query;
 
@@ -1273,11 +1503,6 @@ function showStudentFormRecommendation(response) {
     BASIC_SHWR_FORM,
     SHS_SHWR_FORM
   ];
-
-  /*
-   * Only display approved form URLs.
-   * Do not allow an arbitrary URL returned by the API.
-   */
 
   if (!approvedForms.includes(formUrl)) {
 
@@ -1323,7 +1548,9 @@ function showResult(
     $("idLabel").textContent =
       "EMPLOYEE NUMBER";
 
-  } else {
+  }
+
+  else {
 
     $("resultLabel").textContent =
       "SHWR VERIFICATION RESULT";

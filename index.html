@@ -2,513 +2,576 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#08783e">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08783e">
 
-  <title>DLSU Laguna | HSU Verification</title>
+<title>DLSU Laguna | HSU Verification</title>
 
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      padding: 14px;
-      background: #f2f4f7;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #222;
-    }
+body {
+  margin: 0;
+  padding: 14px;
+  background: #f2f4f7;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222;
+}
 
-    .container {
-      width: 100%;
-      max-width: 520px;
-      margin: 18px auto;
-      padding: 22px;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.08);
-    }
+.container {
+  width: 100%;
+  max-width: 520px;
+  margin: 18px auto;
+  padding: 22px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.08);
+}
 
-    .header {
-      text-align: center;
-    }
+.header {
+  text-align: center;
+}
 
-    .university {
-      color: #08783e;
-      font-size: 17px;
-      font-weight: bold;
-    }
+.university {
+  color: #08783e;
+  font-size: 17px;
+  font-weight: bold;
+}
 
-    .unit {
-      margin-top: 5px;
-      font-size: 13px;
-      font-weight: bold;
-      color: #555;
-    }
+.unit {
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+}
 
-    h1 {
-      margin: 19px 0 5px;
-      color: #08783e;
-      font-size: 23px;
-    }
+h1 {
+  margin: 19px 0 5px;
+  color: #08783e;
+  font-size: 23px;
+}
 
-    .subtitle {
-      font-size: 13px;
-      color: #666;
-      line-height: 1.5;
-    }
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
 
-    .announcement {
-      margin: 20px 0;
-      padding: 14px;
-      background: #f0f7f2;
-      border-left: 4px solid #08783e;
-      border-radius: 6px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
+.announcement {
+  margin: 20px 0;
+  padding: 14px;
+  background: #f0f7f2;
+  border-left: 4px solid #08783e;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
 
-    .announcement strong {
-      color: #08783e;
-    }
+.announcement strong {
+  color: #08783e;
+}
 
-    .section-title {
-      margin: 20px 0 10px;
-      font-size: 14px;
-      font-weight: bold;
-    }
+.section-title {
+  margin: 20px 0 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
 
-    #reader {
-      width: 100%;
-      min-height: 90px;
-      overflow: hidden;
-      border: 2px dashed #b8c8bd;
-      border-radius: 10px;
-      background: #fafafa;
-    }
+#reader {
+  width: 100%;
+  min-height: 90px;
+  overflow: hidden;
+  border: 2px dashed #b8c8bd;
+  border-radius: 10px;
+  background: #fafafa;
+}
 
-    #reader video {
-      width: 100% !important;
-      border-radius: 8px;
-    }
+#reader video {
+  width: 100% !important;
+  border-radius: 8px;
+}
 
-    input,
-    select {
-      width: 100%;
-      padding: 15px;
-      margin-top: 8px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      text-align: center;
-      background: #fff;
-    }
+input,
+select {
+  width: 100%;
+  padding: 15px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+  background: #fff;
+}
 
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #08783e;
-    }
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #08783e;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      border: 0;
-      border-radius: 8px;
-      background: #08783e;
-      color: #fff;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #08783e;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
 
-    .secondary {
-      background: #555;
-    }
+.secondary {
+  background: #555;
+}
 
-    .hidden {
-      display: none !important;
-    }
+.hidden {
+  display: none !important;
+}
 
-    .status {
-      display: none;
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      line-height: 1.5;
-      text-align: center;
-      overflow-wrap: anywhere;
-    }
+.status {
+  display: none;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
 
-    .status.info {
-      display: block;
-      background: #e8f1ff;
-      color: #174b83;
-    }
+.status.info {
+  display: block;
+  background: #e8f1ff;
+  color: #174b83;
+}
 
-    .status.success {
-      display: block;
-      background: #e6f5eb;
-      color: #08783e;
-    }
+.status.success {
+  display: block;
+  background: #e6f5eb;
+  color: #08783e;
+}
 
-    .status.error {
-      display: block;
-      background: #fdeaea;
-      color: #a51d1d;
-    }
+.status.error {
+  display: block;
+  background: #fdeaea;
+  color: #a51d1d;
+}
 
-    .result {
-      display: none;
-      margin-top: 20px;
-      padding: 24px 15px;
-      border-radius: 12px;
-      text-align: center;
-    }
+.result {
+  display: none;
+  margin-top: 20px;
+  padding: 24px 15px;
+  border-radius: 12px;
+  text-align: center;
+}
 
-    .with-shwr,
-    .cleared {
-      background: #e5f5eb;
-      border: 2px solid #168346;
-    }
+.with-shwr,
+.cleared {
+  background: #e5f5eb;
+  border: 2px solid #168346;
+}
 
-    .no-shwr,
-    .not-cleared {
-      background: #fff0f0;
-      border: 2px solid #c62828;
-    }
+.no-shwr,
+.not-cleared {
+  background: #fff0f0;
+  border: 2px solid #c62828;
+}
 
-    .error-result {
-      background: #fff5e5;
-      border: 2px solid #d18a00;
-    }
+.error-result {
+  background: #fff5e5;
+  border: 2px solid #d18a00;
+}
 
-    .result-label {
-      color: #555;
-      font-size: 12px;
-      font-weight: bold;
-      letter-spacing: .4px;
-    }
+.result-label {
+  color: #555;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: .4px;
+}
 
-    .result-status {
-      margin: 12px 0;
-      font-size: 28px;
-      font-weight: bold;
-      overflow-wrap: anywhere;
-    }
+.result-status {
+  margin: 12px 0;
+  font-size: 28px;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
 
-    .with-shwr .result-status,
-    .cleared .result-status {
-      color: #08783e;
-    }
+.with-shwr .result-status,
+.cleared .result-status {
+  color: #08783e;
+}
 
-    .no-shwr .result-status,
-    .not-cleared .result-status {
-      color: #c62828;
-    }
+.no-shwr .result-status,
+.not-cleared .result-status {
+  color: #c62828;
+}
 
-    .error-result .result-status {
-      color: #a56800;
-      font-size: 22px;
-    }
+.error-result .result-status {
+  color: #a56800;
+  font-size: 22px;
+}
 
-    .student-id {
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #333;
-      overflow-wrap: anywhere;
-    }
+.student-id {
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  overflow-wrap: anywhere;
+}
 
-    .clinic-instruction {
-      margin-top: 18px;
-      padding: 15px;
-      background: #fff;
-      border: 1px solid #e2aaaa;
-      border-radius: 8px;
-      color: #a51d1d;
-      font-size: 14px;
-      font-weight: bold;
-      line-height: 1.7;
-    }
+.clinic-instruction {
+  margin-top: 18px;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #e2aaaa;
+  border-radius: 8px;
+  color: #a51d1d;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.7;
+}
 
-    .clinic-list {
-      margin-top: 8px;
-      color: #333;
-      font-size: 14px;
-      font-weight: normal;
-    }
+.clinic-list {
+  margin-top: 8px;
+  color: #333;
+  font-size: 14px;
+  font-weight: normal;
+}
 
-    .form-recommendation {
-      margin-top: 18px;
-      padding: 15px;
-      background: #fff;
-      border: 1px solid #b8d8c2;
-      border-radius: 8px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
+.form-recommendation {
+  margin-top: 18px;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #b8d8c2;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
 
-    .form-recommendation a {
-      display: block;
-      margin-top: 10px;
-      padding: 12px;
-      background: #08783e;
-      border-radius: 7px;
-      color: #fff;
-      font-weight: bold;
-      text-decoration: none;
-    }
+.form-recommendation a {
+  display: block;
+  margin-top: 10px;
+  padding: 12px;
+  background: #08783e;
+  border-radius: 7px;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+}
 
-    .browser-note {
-      margin-top: 22px;
-      padding: 13px;
-      background: #fff8e6;
-      border-left: 4px solid #d69e00;
-      border-radius: 6px;
-      color: #755500;
-      font-size: 12px;
-      line-height: 1.5;
-      text-align: center;
-    }
+.nfc-indicator {
+  margin-top: 8px;
+  padding: 10px;
+  background: #f0f7f2;
+  border-radius: 7px;
+  color: #08783e;
+  font-size: 12px;
+  text-align: center;
+}
 
-    .footer {
-      margin-top: 22px;
-      color: #888;
-      font-size: 11px;
-      line-height: 1.5;
-      text-align: center;
-    }
+.browser-note {
+  margin-top: 22px;
+  padding: 13px;
+  background: #fff8e6;
+  border-left: 4px solid #d69e00;
+  border-radius: 6px;
+  color: #755500;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
 
-    @media(max-width:480px) {
-      body {
-        padding: 8px;
-      }
+.footer {
+  margin-top: 22px;
+  color: #888;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
 
-      .container {
-        margin: 8px auto;
-        padding: 18px;
-      }
+@media(max-width:480px) {
+  body {
+    padding: 8px;
+  }
 
-      h1 {
-        font-size: 20px;
-      }
-    }
-  </style>
+  .container {
+    margin: 8px auto;
+    padding: 18px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <main class="container">
 
-  <header class="header">
-    <div class="university">DE LA SALLE UNIVERSITY</div>
-    <div class="unit">
-      LAGUNA CAMPUS<br>
-      HEALTH SERVICES UNIT
-    </div>
+<header class="header">
 
-    <h1>HSU VERIFICATION SYSTEM</h1>
-
-    <div class="subtitle">
-      Student Health and Wellness Record<br>
-      Academic Year 2026–2027
-    </div>
-  </header>
-
-  <section class="announcement">
-    <strong>ANNOUNCEMENT</strong>
-
-    <p>
-      Use this system to verify student SHWR submission
-      or employee number records.
-    </p>
-
-    <p>
-      Select the appropriate verification type before
-      scanning or entering an identification number.
-    </p>
-  </section>
-
-  <!-- VERIFICATION TYPE -->
-
-  <div class="section-title">
-    1. SELECT VERIFICATION TYPE
+  <div class="university">
+    DE LA SALLE UNIVERSITY
   </div>
 
-  <select id="verificationType">
-    <option value="student">STUDENT - SHWR VERIFICATION</option>
-    <option value="employee">EMPLOYEE - CLEARANCE VERIFICATION</option>
-  </select>
-
-  <!-- CAMERA SCANNER -->
-
-  <div class="section-title">
-    2. QR CODE / BARCODE SCANNER
+  <div class="unit">
+    LAGUNA CAMPUS<br>
+    HEALTH SERVICES UNIT
   </div>
 
-  <div id="reader"></div>
+  <h1>HSU VERIFICATION SYSTEM</h1>
 
-  <button id="startCameraButton" type="button">
-    START CAMERA SCANNER
-  </button>
-
-  <button
-    id="stopCameraButton"
-    class="secondary hidden"
-    type="button">
-    STOP CAMERA
-  </button>
-
-  <!-- NFC SCANNER -->
-
-  <div class="section-title">
-    3. NFC SCANNER
+  <div class="subtitle">
+    Student Health and Wellness Record<br>
+    Academic Year 2026–2027
   </div>
 
-  <button id="startNfcButton" type="button">
-    SCAN NFC CARD
-  </button>
+</header>
 
-  <button
-    id="stopNfcButton"
-    class="secondary hidden"
-    type="button">
-    STOP NFC SCANNING
-  </button>
 
-  <div class="subtitle" style="margin-top:7px">
-    NFC requires a compatible Android device, Chrome,
-    HTTPS, and a supported NDEF record.
+<section class="announcement">
+
+  <strong>ANNOUNCEMENT</strong>
+
+  <p>
+    Use this system to verify student SHWR submission
+    or employee number records.
+  </p>
+
+  <p>
+    Select the appropriate verification type before
+    scanning or entering an identification number.
+  </p>
+
+</section>
+
+
+<!-- VERIFICATION TYPE -->
+
+<div class="section-title">
+  1. SELECT VERIFICATION TYPE
+</div>
+
+<select id="verificationType">
+
+  <option value="student">
+    STUDENT - SHWR VERIFICATION
+  </option>
+
+  <option value="employee">
+    EMPLOYEE - CLEARANCE VERIFICATION
+  </option>
+
+</select>
+
+
+<!-- QR / BARCODE SCANNER -->
+
+<div class="section-title">
+  2. QR CODE / BARCODE SCANNER
+</div>
+
+<div id="reader"></div>
+
+<button id="startCameraButton" type="button">
+  START CAMERA SCANNER
+</button>
+
+<button
+  id="stopCameraButton"
+  class="secondary hidden"
+  type="button">
+
+  STOP CAMERA
+
+</button>
+
+
+<!-- MIFARE NFC SCANNER -->
+
+<div class="section-title">
+  3. MIFARE NFC SCANNER
+</div>
+
+<button id="startNfcButton" type="button">
+
+  SCAN MIFARE STUDENT ID
+
+</button>
+
+<div id="nfcDeviceStatus" class="nfc-indicator">
+
+  Waiting for Android NFC reader...
+
+</div>
+
+<div class="subtitle" style="margin-top:7px">
+
+  Place the student ID card near the NFC area
+  of your Android phone.
+
+  <br><br>
+
+  Native Android NFC is required for hardware UID reading.
+
+</div>
+
+
+<!-- MANUAL ENTRY -->
+
+<div class="section-title">
+  4. MANUAL ID ENTRY
+</div>
+
+<input
+  id="idInput"
+  type="text"
+  placeholder="Enter Student ID Number"
+  autocomplete="off"
+  autocapitalize="characters">
+
+<button id="verifyButton" type="button">
+
+  VERIFY STUDENT
+
+</button>
+
+
+<!-- STATUS -->
+
+<div
+  id="statusMessage"
+  class="status"
+  role="status"
+  aria-live="polite">
+
+</div>
+
+
+<!-- RESULT -->
+
+<section
+  id="resultBox"
+  class="result"
+  aria-live="polite">
+
+  <div id="resultLabel" class="result-label">
+    VERIFICATION RESULT
   </div>
 
-  <!-- MANUAL ENTRY -->
+  <div id="resultStatus" class="result-status"></div>
 
-  <div class="section-title">
-    4. MANUAL ID ENTRY
+  <div id="idLabel" class="result-label">
+    IDENTIFICATION NUMBER
   </div>
 
-  <input
-    id="idInput"
-    type="text"
-    placeholder="Enter Student ID Number"
-    autocomplete="off"
-    autocapitalize="characters">
+  <div id="resultId" class="student-id"></div>
 
-  <button id="verifyButton" type="button">
-    VERIFY STUDENT
-  </button>
 
-  <!-- STATUS -->
+  <!-- EMPLOYEE INSTRUCTION -->
 
   <div
-    id="statusMessage"
-    class="status"
-    role="status"
-    aria-live="polite">
+    id="clinicInstruction"
+    class="clinic-instruction hidden">
+
+    NOT CLEARED
+
+    <div class="clinic-list">
+
+      PLEASE PROCEED TO ANY OF THE FOLLOWING CLINICS:
+
+      <br>MRR CLINIC
+      <br>LC1 CLINIC
+      <br>LC2 CLINIC
+      <br>UH CLINIC
+
+    </div>
+
   </div>
 
-  <!-- RESULT -->
 
-  <section
-    id="resultBox"
-    class="result"
-    aria-live="polite">
+  <!-- STUDENT FORM RECOMMENDATION -->
 
-    <div id="resultLabel" class="result-label">
-      VERIFICATION RESULT
-    </div>
+  <div
+    id="formRecommendation"
+    class="form-recommendation hidden">
 
-    <div id="resultStatus" class="result-status"></div>
-
-    <div id="idLabel" class="result-label">
-      IDENTIFICATION NUMBER
-    </div>
-
-    <div id="resultId" class="student-id"></div>
-
-    <!-- EMPLOYEE INSTRUCTION -->
-
-    <div
-      id="clinicInstruction"
-      class="clinic-instruction hidden">
-
-      NOT CLEARED
-
-      <div class="clinic-list">
-        PLEASE PROCEED TO ANY OF THE FOLLOWING CLINICS:
-
-        <br>MRR CLINIC
-        <br>LC1 CLINIC
-        <br>LC2 CLINIC
-        <br>UH CLINIC
-      </div>
-    </div>
-
-    <!-- STUDENT FORM RECOMMENDATION -->
-
-    <div
-      id="formRecommendation"
-      class="form-recommendation hidden">
-
-      <strong>SHWR SUBMISSION REQUIRED</strong>
-
-      <p>
-        No SHWR submission record was found.
-        Please accomplish the appropriate SHWR form.
-      </p>
-
-      <a
-        id="formLink"
-        href="#"
-        target="_blank"
-        rel="noopener">
-        OPEN SHWR FORM
-      </a>
-    </div>
-
-  </section>
-
-  <button
-    id="nextButton"
-    class="hidden"
-    type="button">
-    SCAN NEXT
-  </button>
-
-  <div class="browser-note">
-    <strong>IMPORTANT REMINDER</strong>
+    <strong>SHWR SUBMISSION REQUIRED</strong>
 
     <p>
-      Use Google Chrome on Android for NFC scanning.
-      Allow camera access when using the camera scanner.
+      No SHWR submission record was found.
+      Please accomplish the appropriate SHWR form.
     </p>
 
-    <p>
-      Standard Web NFC reads supported NDEF records.
-      It cannot directly read arbitrary MIFARE hardware UIDs.
-    </p>
+    <a
+      id="formLink"
+      href="#"
+      target="_blank"
+      rel="noopener">
+
+      OPEN SHWR FORM
+
+    </a>
+
   </div>
 
-  <footer class="footer">
-    DE LA SALLE UNIVERSITY - LAGUNA CAMPUS<br>
-    HEALTH SERVICES UNIT<br>
-    STUDENT HEALTH AND WELLNESS RECORD<br>
-    ACADEMIC YEAR 2026–2027
-  </footer>
+</section>
+
+
+<!-- NEXT SCAN -->
+
+<button
+  id="nextButton"
+  class="hidden"
+  type="button">
+
+  SCAN NEXT
+
+</button>
+
+
+<div class="browser-note">
+
+  <strong>IMPORTANT REMINDER</strong>
+
+  <p>
+    Use the HSU Android NFC application for MIFARE UID
+    scanning. A normal browser cannot directly read
+    arbitrary MIFARE hardware UIDs.
+  </p>
+
+  <p>
+    Allow camera access when using the camera scanner.
+  </p>
+
+</div>
+
+
+<footer class="footer">
+
+  DE LA SALLE UNIVERSITY - LAGUNA CAMPUS<br>
+  HEALTH SERVICES UNIT<br>
+  STUDENT HEALTH AND WELLNESS RECORD<br>
+  ACADEMIC YEAR 2026–2027
+
+</footer>
 
 </main>
+
 
 <script>
 
@@ -518,6 +581,8 @@
  * FRONTEND: GITHUB PAGES
  * BACKEND: GOOGLE APPS SCRIPT
  * DATABASE: GOOGLE SHEETS
+ *
+ * NFC: ANDROID NATIVE MIFARE UID
  * API: JSONP
  ***************************************************************/
 
@@ -525,7 +590,7 @@
 /*********************** API CONFIGURATION **********************/
 
 const SHWR_API_URL =
-  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbzwmwvxbs76BkShITpDzUcaVLesri7bb8ppMcaT7JJtC-T_b1LmS__J9Rmn86WuYdC2QA/exec";
+  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbyEzEKCL7LwNvvpMKR6kcHDrnYSYQ91ZoNV-vLILy5Bx_IKpjLt4bGvFWU5pz4c98O8Yw/exec";
 
 
 /*********************** FORM CONFIGURATION *********************/
@@ -542,12 +607,7 @@ const SHS_SHWR_FORM =
 let qrScanner = null;
 let cameraRunning = false;
 
-let nfcReader = null;
-let nfcAbortController = null;
-
 let isProcessing = false;
-
-const $ = id => document.getElementById(id);
 
 
 /*********************** INITIALIZATION *************************/
@@ -556,20 +616,40 @@ window.addEventListener("load", () => {
 
   updateVerificationType();
 
+  updateNfcDeviceStatus();
+
   showStatus(
     "HSU Verification System is ready.",
     "success"
   );
 
-  $("startNfcButton").disabled =
-    !("NDEFReader" in window);
+});
 
-  if (!("NDEFReader" in window)) {
-    $("startNfcButton").title =
-      "Web NFC is not supported by this browser.";
+
+/*********************** NFC DEVICE STATUS *********************/
+
+function updateNfcDeviceStatus() {
+
+  const status = $("nfcDeviceStatus");
+
+  if (window.AndroidNFC) {
+
+    status.textContent =
+      "ANDROID NFC CONNECTED - READY TO SCAN";
+
+  } else {
+
+    status.textContent =
+      "Android NFC application is not connected. Use camera or manual entry.";
+
   }
 
-});
+}
+
+
+/*********************** DOM HELPER *****************************/
+
+const $ = id => document.getElementById(id);
 
 
 /*********************** ID NORMALIZATION ***********************/
@@ -636,9 +716,11 @@ async function startCamera() {
   try {
 
     if (!window.Html5Qrcode) {
+
       throw new Error(
         "Scanner library did not load. Check your internet connection."
       );
+
     }
 
     showStatus(
@@ -647,16 +729,22 @@ async function startCamera() {
     );
 
     if (!qrScanner) {
+
       qrScanner = new Html5Qrcode("reader");
+
     }
 
     const config = {
+
       fps: 10,
+
       qrbox: {
         width: 250,
         height: 150
       },
+
       aspectRatio: 1.0
+
     };
 
     try {
@@ -686,7 +774,7 @@ async function startCamera() {
     $("stopCameraButton").classList.remove("hidden");
 
     showStatus(
-      "Camera scanner is ready. Position the code inside the frame.",
+      "Camera scanner is ready.",
       "success"
     );
 
@@ -709,7 +797,9 @@ async function stopCamera() {
   try {
 
     if (qrScanner && cameraRunning) {
+
       await qrScanner.stop();
+
     }
 
   } catch (error) {
@@ -742,24 +832,44 @@ async function onQrDecoded(decodedText) {
 }
 
 
-/************************ NFC SCANNER ***************************/
+/*********************** ANDROID MIFARE NFC *********************/
 
 /*
- * Web NFC reads supported NDEF records.
- * It does not read arbitrary MIFARE hardware UIDs.
+ * Android Kotlin application exposes:
  *
- * Expected card content:
- * NDEF Text record containing the identifier.
+ * window.AndroidNFC
+ *
+ * Android calls:
+ * window.onNativeNfcUid(uid)
+ *
+ * This website sends the UID to Google Apps Script.
+ *
+ * The UID is never treated as a Student ID directly.
+ * The backend resolves UID through NFC_UID_MAP.
  */
 
-async function startNfc() {
 
-  if (isProcessing || nfcReader) return;
+/*********************** NFC BUTTON *****************************/
 
-  if (!("NDEFReader" in window)) {
+$("startNfcButton").addEventListener("click", () => {
+
+  if (isProcessing) return;
+
+  if (!window.AndroidNFC) {
 
     showStatus(
-      "NFC is not supported. Use compatible Android Chrome over HTTPS.",
+      "Native Android NFC reader is not connected. Open this website inside the HSU Android application.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if (typeof window.AndroidNFC.startScan !== "function") {
+
+    showStatus(
+      "Android NFC scanner interface is unavailable.",
       "error"
     );
 
@@ -769,165 +879,297 @@ async function startNfc() {
 
   try {
 
-    nfcReader = new NDEFReader();
+    $("startNfcButton").disabled = true;
 
-    nfcAbortController = new AbortController();
-
-    await nfcReader.scan({
-      signal: nfcAbortController.signal
-    });
-
-    $("startNfcButton").classList.add("hidden");
-
-    $("stopNfcButton").classList.remove("hidden");
+    $("nfcDeviceStatus").textContent =
+      "WAITING FOR MIFARE CARD...";
 
     showStatus(
-      "NFC is ready. Hold the supported NFC card near the phone.",
-      "success"
+      "Hold your DLSU ID card near the Android phone.",
+      "info"
     );
 
-    nfcReader.onreading = event => {
-
-      if (isProcessing) return;
-
-      const identifier =
-        extractIdentifierFromNdef(event.message);
-
-      if (!identifier) {
-
-        showStatus(
-          "No supported identification record was found on this NFC card.",
-          "error"
-        );
-
-        return;
-
-      }
-
-      const selectedType =
-        $("verificationType").value;
-
-      stopNfc();
-
-      verifyIdentifier(identifier, selectedType);
-
-    };
-
-    nfcReader.onreadingerror = () => {
-
-      showStatus(
-        "Could not read this NFC tag. Check that it contains a supported NDEF record.",
-        "error"
-      );
-
-    };
+    window.AndroidNFC.startScan();
 
   } catch (error) {
 
-    stopNfc();
+    $("startNfcButton").disabled = false;
 
     showStatus(
-      "NFC ERROR: " + (error.message || error),
+      "Unable to start NFC: " + error.message,
       "error"
     );
 
   }
 
-}
+});
 
 
-function extractIdentifierFromNdef(message) {
+/*********************** RECEIVE ANDROID UID ********************/
 
-  for (const record of message.records) {
+/*
+ * Called by the Android Kotlin application.
+ *
+ * Expected value:
+ * A1B2C3D4
+ *
+ * This is the card UID, not the Student ID.
+ */
 
-    try {
+window.onNativeNfcUid = function(rawUID) {
 
-      if (record.recordType === "text") {
+  if (isProcessing) return;
 
-        const decoder = new TextDecoder(
-          record.encoding || "utf-8"
-        );
+  const uid = String(rawUID || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^0-9A-F]/g, "");
 
-        const value = decoder
-          .decode(record.data)
-          .trim();
+  $("startNfcButton").disabled = false;
 
-        if (value) return value;
+  if (!uid) {
 
-      }
+    $("nfcDeviceStatus").textContent =
+      "INVALID NFC UID";
 
-      if (record.recordType === "url") {
+    showStatus(
+      "The NFC card UID is invalid.",
+      "error"
+    );
 
-        const decoder = new TextDecoder();
+    return;
 
-        const value = decoder
-          .decode(record.data)
-          .trim();
+  }
 
-        if (value) {
+  $("nfcDeviceStatus").textContent =
+    "NFC CARD DETECTED - VERIFYING";
 
-          try {
+  verifyNfcUID(uid);
 
-            const parsed = new URL(value);
+};
 
-            const lastPart = parsed.pathname
-              .split("/")
-              .filter(Boolean)
-              .pop();
 
-            return lastPart || value;
+/*********************** NFC ERROR HANDLER **********************/
 
-          } catch (error) {
+window.onNativeNfcError = function(message) {
 
-            return value;
+  $("startNfcButton").disabled = false;
 
-          }
+  $("nfcDeviceStatus").textContent =
+    "NFC SCANNER ERROR";
 
-        }
+  showStatus(
+    String(message || "Unable to read NFC card."),
+    "error"
+  );
 
-      }
+};
 
-    } catch (error) {
 
-      console.warn(
-        "NDEF record could not be decoded."
+/*********************** NFC VERIFICATION ************************/
+
+function verifyNfcUID(uid) {
+
+  if (isProcessing) return;
+
+  isProcessing = true;
+
+  $("verifyButton").disabled = true;
+
+  $("startNfcButton").disabled = true;
+
+  $("resultBox").style.display = "none";
+
+  $("nextButton").classList.add("hidden");
+
+  $("clinicInstruction").classList.add("hidden");
+
+  $("formRecommendation").classList.add("hidden");
+
+  showStatus(
+    "Checking registered NFC card...",
+    "info"
+  );
+
+  const callbackName =
+    "hsuNfcCallback_" +
+    Date.now() +
+    "_" +
+    Math.floor(Math.random() * 100000);
+
+  const script = document.createElement("script");
+
+  let completed = false;
+
+  let timeoutId;
+
+
+  function cleanup() {
+
+    if (completed) return;
+
+    completed = true;
+
+    clearTimeout(timeoutId);
+
+    delete window[callbackName];
+
+    if (script.parentNode) {
+
+      script.parentNode.removeChild(script);
+
+    }
+
+    isProcessing = false;
+
+    $("verifyButton").disabled = false;
+
+    $("startNfcButton").disabled = false;
+
+  }
+
+
+  function fail(message) {
+
+    if (completed) return;
+
+    cleanup();
+
+    showResult(
+      "ERROR",
+      "NFC VERIFICATION",
+      "error-result",
+      "student"
+    );
+
+    $("nfcDeviceStatus").textContent =
+      "NFC VERIFICATION FAILED";
+
+    showStatus(message, "error");
+
+  }
+
+
+  window[callbackName] = response => {
+
+    if (completed) return;
+
+    cleanup();
+
+    if (!response || response.success !== true) {
+
+      showResult(
+        "UNREGISTERED CARD",
+        "NFC CARD",
+        "error-result",
+        "student"
+      );
+
+      $("nfcDeviceStatus").textContent =
+        "CARD NOT REGISTERED";
+
+      showStatus(
+        response && response.message
+          ? response.message
+          : "NFC verification failed.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if (response.status === "WITH SHWR") {
+
+      showResult(
+        "WITH SHWR",
+        response.studentId,
+        "with-shwr",
+        "student"
+      );
+
+      $("formRecommendation").classList.add("hidden");
+
+      $("nfcDeviceStatus").textContent =
+        "REGISTERED NFC CARD";
+
+      showStatus(
+        "SHWR submission record found.",
+        "success"
+      );
+
+    } else if (response.status === "NO SHWR") {
+
+      showResult(
+        "NO SHWR",
+        response.studentId,
+        "no-shwr",
+        "student"
+      );
+
+      showStudentFormRecommendation(response);
+
+      $("nfcDeviceStatus").textContent =
+        "REGISTERED NFC CARD";
+
+      showStatus(
+        "No SHWR submission record was found.",
+        "error"
+      );
+
+    } else {
+
+      showResult(
+        "ERROR",
+        response.studentId || "NFC CARD",
+        "error-result",
+        "student"
+      );
+
+      showStatus(
+        response.message ||
+        "Unexpected NFC response.",
+        "error"
       );
 
     }
 
-  }
+  };
 
-  return "";
+
+  script.onerror = () => {
+
+    fail(
+      "Unable to connect to the HSU API. Check the deployment URL and internet connection."
+    );
+
+  };
+
+
+  timeoutId = setTimeout(() => {
+
+    fail(
+      "NFC verification server timeout. Please try again."
+    );
+
+  }, 15000);
+
+
+  const query =
+    "?action=verifyUid" +
+    "&uid=" + encodeURIComponent(uid) +
+    "&callback=" + encodeURIComponent(callbackName) +
+    "&_=" + Date.now();
+
+  script.src = SHWR_API_URL + query;
+
+  document.head.appendChild(script);
 
 }
 
 
-function stopNfc() {
-
-  try {
-
-    if (nfcAbortController) {
-      nfcAbortController.abort();
-    }
-
-  } catch (error) {
-
-    console.warn("NFC stop:", error);
-
-  }
-
-  nfcReader = null;
-
-  nfcAbortController = null;
-
-  $("startNfcButton").classList.remove("hidden");
-
-  $("stopNfcButton").classList.add("hidden");
-
-}
-
-
-/************************ MANUAL ENTRY **************************/
+/*********************** MANUAL ENTRY **************************/
 
 function verifyManual() {
 
@@ -958,21 +1200,15 @@ function verifyManual() {
 $("idInput").addEventListener("keydown", event => {
 
   if (event.key === "Enter") {
+
     verifyManual();
+
   }
 
 });
 
 
 /*********************** JSONP VERIFICATION *********************/
-
-/*
- * Sends:
- * action=verify
- * id=IDENTIFIER
- * type=student OR employee
- * callback=JSONP_CALLBACK
- */
 
 function verifyIdentifier(rawIdentifier, verificationType) {
 
@@ -1029,7 +1265,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     "_" +
     Math.floor(Math.random() * 100000);
 
-
   const script = document.createElement("script");
 
   let completed = false;
@@ -1048,7 +1283,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     delete window[callbackName];
 
     if (script.parentNode) {
+
       script.parentNode.removeChild(script);
+
     }
 
     $("verifyButton").disabled = false;
@@ -1093,8 +1330,9 @@ function verifyIdentifier(rawIdentifier, verificationType) {
       );
 
       showStatus(
-        (response && response.message) ||
-        "Verification failed.",
+        response && response.message
+          ? response.message
+          : "Verification failed.",
         "error"
       );
 
@@ -1106,17 +1344,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
     /**************** EMPLOYEE VERIFICATION ****************/
 
     if (verificationType === "employee") {
-
-      /*
-       * USER-REQUESTED DISPLAY RULE:
-       *
-       * Employee number FOUND:
-       * Display NOT CLEARED.
-       * Direct employee to clinic.
-       *
-       * Employee number NOT FOUND:
-       * Display CLEARED.
-       */
 
       if (response.status === "VERIFIED") {
 
@@ -1142,8 +1369,6 @@ function verifyIdentifier(rawIdentifier, verificationType) {
           "cleared",
           "employee"
         );
-
-        $("clinicInstruction").classList.add("hidden");
 
         showStatus(
           "Employee number was not found in the employee database.",
@@ -1241,9 +1466,7 @@ function verifyIdentifier(rawIdentifier, verificationType) {
 
   timeoutId = setTimeout(() => {
 
-    fail(
-      "Server timeout. Please try again."
-    );
+    fail("Server timeout. Please try again.");
 
   }, 15000);
 
@@ -1273,11 +1496,6 @@ function showStudentFormRecommendation(response) {
     BASIC_SHWR_FORM,
     SHS_SHWR_FORM
   ];
-
-  /*
-   * Only display approved form URLs.
-   * Do not allow an arbitrary URL returned by the API.
-   */
 
   if (!approvedForms.includes(formUrl)) {
 
@@ -1357,8 +1575,6 @@ async function resetApp() {
 
   await stopCamera();
 
-  stopNfc();
-
   isProcessing = false;
 
   $("idInput").value = "";
@@ -1374,6 +1590,13 @@ async function resetApp() {
   $("nextButton").classList.add("hidden");
 
   $("verifyButton").disabled = false;
+
+  $("startNfcButton").disabled = false;
+
+  $("nfcDeviceStatus").textContent =
+    window.AndroidNFC
+      ? "ANDROID NFC CONNECTED - READY TO SCAN"
+      : "Android NFC application is not connected.";
 
   showStatus(
     "Ready for the next verification.",
@@ -1397,16 +1620,6 @@ $("stopCameraButton").addEventListener(
   stopCamera
 );
 
-$("startNfcButton").addEventListener(
-  "click",
-  startNfc
-);
-
-$("stopNfcButton").addEventListener(
-  "click",
-  stopNfc
-);
-
 $("verifyButton").addEventListener(
   "click",
   verifyManual
@@ -1416,6 +1629,11 @@ $("nextButton").addEventListener(
   "click",
   resetApp
 );
+
+
+/************************ INITIALIZATION ************************/
+
+updateNfcDeviceStatus();
 
 </script>
 

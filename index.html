@@ -502,6 +502,7 @@
 </div>
 
 
+
 <script>
 
 /***************************************************************
@@ -509,7 +510,7 @@
  ***************************************************************/
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxJRr5xFbb6y-JEDF8xPZTVxgoHIFx_rcV_hWKWseUrHzkWPpXUmStfepEQqyjAyPoFng/exec";
+  "https://script.google.com/macros/s/AKfycbzrXUC7TqkMxZUCW9X-Es96rX4Cq2_m1oo8jn0IECpeqCvOT4L0pHHewjjmJPvEkEi_hg/exec";
 
 
 /***************************************************************
@@ -520,6 +521,9 @@ let html5QrCode = null;
 let nfcReader = null;
 let nfcAbortController = null;
 let isVerifying = false;
+let activeJSONPScript = null;
+let activeJSONPCallback = null;
+let activeJSONPTimeout = null;
 
 
 /***************************************************************
@@ -710,9 +714,7 @@ function extractGenericIdentifier(value) {
 
   if (numericMatches && numericMatches.length) {
 
-    return cleanIdentifier(
-      numericMatches[0]
-    );
+    return cleanIdentifier(numericMatches[0]);
 
   }
 
@@ -722,9 +724,7 @@ function extractGenericIdentifier(value) {
 
   if (alphanumericMatches && alphanumericMatches.length) {
 
-    return cleanIdentifier(
-      alphanumericMatches[0]
-    );
+    return cleanIdentifier(alphanumericMatches[0]);
 
   }
 
@@ -864,9 +864,52 @@ function verifyManual() {
 
 
 /***************************************************************
- * 10. UNIVERSAL VERIFICATION REQUEST
- *
- * No Student/Employee type is sent.
+ * 10. JSONP CLEANUP
+ ***************************************************************/
+
+function cleanupJSONP() {
+
+  if (activeJSONPTimeout) {
+
+    clearTimeout(activeJSONPTimeout);
+
+    activeJSONPTimeout = null;
+
+  }
+
+  if (activeJSONPScript) {
+
+    activeJSONPScript.onerror = null;
+
+    if (activeJSONPScript.parentNode) {
+      activeJSONPScript.parentNode.removeChild(
+        activeJSONPScript
+      );
+    }
+
+    activeJSONPScript = null;
+
+  }
+
+  if (activeJSONPCallback) {
+
+    delete window[activeJSONPCallback];
+
+    activeJSONPCallback = null;
+
+  }
+
+  isVerifying = false;
+
+  document.getElementById(
+    "loading"
+  ).style.display = "none";
+
+}
+
+
+/***************************************************************
+ * 11. UNIVERSAL VERIFICATION REQUEST
  ***************************************************************/
 
 function verifyIdentifier(id) {
@@ -907,14 +950,21 @@ function verifyIdentifier(id) {
     "hsuCallback_" +
     Date.now() +
     "_" +
-    Math.floor(Math.random() * 100000);
+    Math.floor(Math.random() * 1000000);
 
   const script = document.createElement("script");
 
-  let completed = false;
-  let timeout;
+  activeJSONPScript = script;
+  activeJSONPCallback = callbackName;
 
-  function cleanup() {
+  let completed = false;
+
+
+  /*************************************************************
+   * SUCCESSFUL JSONP CALLBACK
+   *************************************************************/
+
+  window[callbackName] = function(response) {
 
     if (completed) {
       return;
@@ -922,38 +972,25 @@ function verifyIdentifier(id) {
 
     completed = true;
 
-    clearTimeout(timeout);
+    cleanupJSONP();
 
-    delete window[callbackName];
-
-    if (script.parentNode) {
-      script.parentNode.removeChild(script);
-    }
-
-    document.getElementById(
-      "loading"
-    ).style.display = "none";
-
-    isVerifying = false;
-
-  }
-
-
-  window[callbackName] = function(response) {
-
-    cleanup();
-
-    if (!response || !response.success) {
+    if (!response || typeof response !== "object") {
 
       showResult(
-        response && response.status
-          ? response.status
-          : "ERROR",
+        "INVALID SERVER RESPONSE",
+        "The HSU service returned an unexpected response.",
+        "error"
+      );
 
-        response && response.message
-          ? response.message
-          : "Unable to verify the identification number.",
+      return;
 
+    }
+
+    if (response.success !== true) {
+
+      showResult(
+        response.status || "VERIFICATION ERROR",
+        response.message || "The verification request failed.",
         "error"
       );
 
@@ -966,44 +1003,75 @@ function verifyIdentifier(id) {
   };
 
 
-  timeout = setTimeout(function() {
+  /*************************************************************
+   * REQUEST TIMEOUT
+   *************************************************************/
 
-    cleanup();
+  activeJSONPTimeout = setTimeout(function() {
+
+    if (completed) {
+      return;
+    }
+
+    completed = true;
+
+    cleanupJSONP();
 
     showResult(
       "CONNECTION TIMEOUT",
-      "The verification service did not respond. Please try again.",
+      "The HSU verification service did not respond within 20 seconds. Please check your internet connection and try again.",
       "error"
     );
 
-  }, 15000);
+  }, 20000);
 
+
+  /*************************************************************
+   * BUILD JSONP URL
+   *************************************************************/
 
   const parameters = new URLSearchParams({
 
     action: "verify",
+
     id: cleanID,
+
     callback: callbackName
 
   });
-
 
   script.src =
     API_URL +
     "?" +
     parameters.toString();
 
+
+  /*************************************************************
+   * SCRIPT LOADING ERROR
+   *************************************************************/
+
   script.onerror = function() {
 
-    cleanup();
+    if (completed) {
+      return;
+    }
+
+    completed = true;
+
+    cleanupJSONP();
 
     showResult(
       "CONNECTION ERROR",
-      "Unable to connect to the HSU verification service. Please check the connection or contact the Health Services Unit.",
+      "The browser could not load the HSU verification endpoint. Check the deployed Web App URL, internet connection, and browser network restrictions.",
       "error"
     );
 
   };
+
+
+  /*************************************************************
+   * SEND REQUEST
+   *************************************************************/
 
   document.body.appendChild(script);
 
@@ -1011,7 +1079,7 @@ function verifyIdentifier(id) {
 
 
 /***************************************************************
- * 11. DISPLAY UNIVERSAL VERIFICATION RESULT
+ * 12. DISPLAY VERIFICATION RESULT
  ***************************************************************/
 
 function displayVerificationResult(response) {
@@ -1022,10 +1090,6 @@ function displayVerificationResult(response) {
 
   const id = response.identificationNumber || "";
 
-
-  /*************************************************************
-   * STUDENT WITH SHWR
-   *************************************************************/
 
   if (status === "WITH SHWR") {
 
@@ -1041,63 +1105,40 @@ function displayVerificationResult(response) {
   }
 
 
-  /*************************************************************
-   * STUDENT WITHOUT SHWR
-   *************************************************************/
-
   if (status === "NO SHWR") {
 
     showResult(
       "NO SHWR SUBMISSION",
       response.message ||
-        "Student record found, but no SHWR submission was located.",
+        "No SHWR submission was found for this identification number.",
       "missing",
-
-      "Identification Number: " + id +
-      (
-        response.gradeLevel
-          ? "\nGrade Level: " + response.gradeLevel
-          : ""
-      )
+      "Identification Number: " + id
     );
-
-
-    if (response.formUrl) {
-
-      const container = document.getElementById(
-        "formContainer"
-      );
-
-      const link = document.createElement("a");
-
-      link.href = response.formUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.className = "form-link";
-
-      link.textContent =
-        "OPEN " +
-        (response.formType || "SHWR") +
-        " SUBMISSION FORM";
-
-      container.appendChild(link);
-
-    }
 
     return;
 
   }
 
 
-  /*************************************************************
-   * EMPLOYEE RECORD FOUND
-   *************************************************************/
+  if (status === "NO RECORDS") {
+
+    showResult(
+      "NO RECORDS AVAILABLE",
+      "The SHWR database currently has no available records.",
+      "error",
+      "Please contact the Health Services Unit."
+    );
+
+    return;
+
+  }
+
 
   if (status === "EMPLOYEE FOUND") {
 
     showResult(
       "EMPLOYEE RECORD FOUND",
-      "An employee identification record was found in the HSU database. Please coordinate with the Health Services Unit for any applicable clearance verification.",
+      "An employee identification record was found. Please coordinate with the Health Services Unit for applicable verification.",
       "employee",
       "Identification Number: " + id
     );
@@ -1107,16 +1148,11 @@ function displayVerificationResult(response) {
   }
 
 
-  /*************************************************************
-   * NO MATCHING RECORD
-   *************************************************************/
-
   if (status === "NOT FOUND") {
 
     showResult(
-      "NO MATCHING RECORD FOUND",
-      response.message ||
-        "No matching identification number was found.",
+      "NO MATCHING RECORD",
+      response.message || "No matching record was found.",
       "error",
       "Identification Number: " + id
     );
@@ -1125,10 +1161,6 @@ function displayVerificationResult(response) {
 
   }
 
-
-  /*************************************************************
-   * UNKNOWN RESPONSE
-   *************************************************************/
 
   showResult(
     status || "UNKNOWN STATUS",
@@ -1141,7 +1173,7 @@ function displayVerificationResult(response) {
 
 
 /***************************************************************
- * 12. SHOW RESULT
+ * 13. SHOW RESULT
  ***************************************************************/
 
 function showResult(
@@ -1197,12 +1229,7 @@ function showResult(
 
 
 /***************************************************************
- * 13. NFC / RFID SCANNING
- *
- * Requires:
- * - Compatible Android device
- * - Chrome browser with Web NFC support
- * - HTTPS website
+ * 14. NFC / RFID SCANNING
  ***************************************************************/
 
 async function startNFC() {
@@ -1236,9 +1263,7 @@ async function startNFC() {
 
       let extractedID = "";
 
-      const records = event.message.records;
-
-      for (const record of records) {
+      for (const record of event.message.records) {
 
         try {
 
@@ -1248,25 +1273,25 @@ async function startNFC() {
               record.encoding || "utf-8"
             );
 
-            const text = decoder.decode(record.data);
-
-            extractedID = extractIdentifier(text);
+            extractedID = extractIdentifier(
+              decoder.decode(record.data)
+            );
 
           } else if (record.recordType === "url") {
 
             const decoder = new TextDecoder();
 
-            const text = decoder.decode(record.data);
-
-            extractedID = extractIdentifier(text);
+            extractedID = extractIdentifier(
+              decoder.decode(record.data)
+            );
 
           } else {
 
             const decoder = new TextDecoder();
 
-            const text = decoder.decode(record.data);
-
-            extractedID = extractIdentifier(text);
+            extractedID = extractIdentifier(
+              decoder.decode(record.data)
+            );
 
           }
 
@@ -1287,7 +1312,7 @@ async function startNFC() {
 
         showResult(
           "NO SUPPORTED ID FOUND",
-          "The NFC tag was detected, but no supported identification number could be extracted. The tag may contain only a card UID or use a format that Web NFC cannot read.",
+          "The NFC tag was detected, but no supported identification number could be extracted. Standard Web NFC cannot directly read every RFID card's hardware UID.",
           "error"
         );
 
@@ -1311,7 +1336,7 @@ async function startNFC() {
 
       showResult(
         "NFC READ ERROR",
-        "Unable to read the NFC tag. Please try scanning again.",
+        "Unable to read the NFC tag. Please try again.",
         "error"
       );
 
@@ -1329,7 +1354,7 @@ async function startNFC() {
     showResult(
       "NFC ERROR",
       error.message ||
-        "Unable to start NFC scanning. Please check your device settings.",
+        "Unable to start NFC scanning.",
       "error"
     );
 
@@ -1339,7 +1364,7 @@ async function startNFC() {
 
 
 /***************************************************************
- * 14. STOP NFC SCANNING
+ * 15. STOP NFC
  ***************************************************************/
 
 function stopNFC() {
@@ -1358,7 +1383,7 @@ function stopNFC() {
 
 
 /***************************************************************
- * 15. START QR / BARCODE CAMERA
+ * 16. START QR / BARCODE CAMERA
  ***************************************************************/
 
 async function startCamera() {
@@ -1413,11 +1438,7 @@ async function startCamera() {
 
       },
 
-      function(errorMessage) {
-
-        // Ignore continuous camera scanning messages.
-
-      }
+      function() {}
 
     );
 
@@ -1439,7 +1460,7 @@ async function startCamera() {
 
 
 /***************************************************************
- * 16. STOP CAMERA
+ * 17. STOP CAMERA
  ***************************************************************/
 
 async function stopCamera() {
@@ -1474,10 +1495,12 @@ async function stopCamera() {
 
 
 /***************************************************************
- * 17. CLEAR ALL
+ * 18. CLEAR ALL
  ***************************************************************/
 
 function clearAll() {
+
+  cleanupJSONP();
 
   stopNFC();
 
@@ -1503,7 +1526,7 @@ function clearAll() {
 
 
 /***************************************************************
- * 18. ENTER KEY SUPPORT
+ * 19. ENTER KEY SUPPORT
  ***************************************************************/
 
 document.getElementById(
@@ -1522,21 +1545,20 @@ document.getElementById(
 
 
 /***************************************************************
- * 19. INITIALIZATION
+ * 20. INITIALIZATION
  ***************************************************************/
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
+console.log(
+  "DLSU Laguna HSU Universal Verification System initialized."
+);
 
-    console.log(
-      "DLSU Laguna HSU Universal Verification System initialized."
-    );
-
-  }
+console.log(
+  "API endpoint:",
+  API_URL
 );
 
 </script>
+
 
 </body>
 </html>

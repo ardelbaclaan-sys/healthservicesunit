@@ -11,6 +11,18 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <style>
+    :root {
+      --green: #08783e;
+      --dark-green: #05602f;
+      --light-green: #eaf6ee;
+      --border: #dce5df;
+      --text: #24332a;
+      --muted: #64746a;
+      --red: #c62828;
+      --orange: #b76b00;
+      --blue: #1769aa;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -18,72 +30,76 @@
     body {
       margin: 0;
       padding: 20px;
-      font-family: Arial, Helvetica, sans-serif;
       background: #f3f6f4;
-      color: #26332b;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
     }
 
     .container {
-      max-width: 650px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
     }
 
     .header {
-      text-align: center;
-      background: #08783e;
+      background: var(--green);
       color: white;
-      padding: 25px 15px;
-      border-radius: 12px 12px 0 0;
-    }
-
-    .header h2,
-    .header h3,
-    .header p {
-      margin: 5px 0;
+      text-align: center;
+      padding: 25px 18px;
+      border-radius: 14px 14px 0 0;
     }
 
     .header h2 {
+      margin: 0;
       font-size: 19px;
+      letter-spacing: .5px;
     }
 
     .header h3 {
-      font-size: 16px;
+      margin: 8px 0 0;
+      font-size: 22px;
     }
 
     .header p {
+      margin: 7px 0 0;
       font-size: 13px;
+      opacity: .95;
     }
 
     .content {
       background: white;
       padding: 22px;
-      border-radius: 0 0 12px 12px;
-      box-shadow: 0 3px 12px rgba(0,0,0,.08);
+      border-radius: 0 0 14px 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
     }
 
     .announcement {
-      background: #fff8e6;
-      border-left: 5px solid #e6a700;
-      padding: 13px;
+      background: #fff8e7;
+      border: 1px solid #f0d99b;
+      border-left: 5px solid #d99a18;
+      padding: 14px;
+      border-radius: 8px;
       margin-bottom: 20px;
-      border-radius: 5px;
       font-size: 13px;
       line-height: 1.6;
     }
 
     .announcement strong {
-      color: #805900;
+      display: block;
+      margin-bottom: 5px;
+      color: #805600;
     }
 
     .announcement a {
-      color: #08783e;
+      color: #075c32;
       font-weight: bold;
+      text-decoration: underline;
     }
 
     label {
       display: block;
-      font-weight: bold;
       margin: 15px 0 7px;
+      font-weight: bold;
       font-size: 14px;
     }
 
@@ -91,21 +107,34 @@
     input {
       width: 100%;
       padding: 13px;
-      border: 1px solid #cbd5ce;
-      border-radius: 7px;
-      font-size: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
       background: white;
     }
 
+    select:focus,
+    input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(8,120,62,.1);
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
     button {
-      width: 100%;
       border: none;
-      border-radius: 7px;
       padding: 13px;
-      margin-top: 10px;
-      font-size: 15px;
-      font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: .2s;
     }
 
     button:disabled {
@@ -113,123 +142,155 @@
       cursor: not-allowed;
     }
 
-    .btn-green {
-      background: #08783e;
+    .primary {
+      background: var(--green);
       color: white;
     }
 
-    .btn-dark {
-      background: #263b30;
+    .primary:hover {
+      background: var(--dark-green);
+    }
+
+    .secondary {
+      background: #edf3ef;
+      color: var(--green);
+      border: 1px solid var(--border);
+    }
+
+    .camera {
+      background: var(--blue);
       color: white;
     }
 
-    .btn-gray {
-      background: #e8eeea;
-      color: #26332b;
+    .stop {
+      background: #fceaea;
+      color: var(--red);
+      border: 1px solid #f1cccc;
+    }
+
+    .nfc {
+      background: #eaf4ff;
+      color: #155b91;
+      border: 1px solid #c9dff2;
     }
 
     #reader {
+      display: none;
+      margin-top: 15px;
       width: 100%;
-      margin-top: 15px;
       overflow: hidden;
-      border-radius: 8px;
+      border-radius: 10px;
     }
 
-    .status {
+    .status-box {
       display: none;
-      padding: 14px;
-      margin-top: 15px;
-      border-radius: 7px;
-      font-size: 14px;
-      line-height: 1.5;
-      text-align: center;
-      overflow-wrap: anywhere;
-    }
-
-    .status.info {
-      display: block;
-      background: #eaf3ff;
-      color: #164b80;
-      border: 1px solid #c6ddf6;
-    }
-
-    .status.success {
-      display: block;
-      background: #e8f6ed;
-      color: #176534;
-      border: 1px solid #b9e1c5;
-    }
-
-    .status.warning {
-      display: block;
-      background: #fff5df;
-      color: #805900;
-      border: 1px solid #f0d58d;
-    }
-
-    .status.error {
-      display: block;
-      background: #fdecec;
-      color: #9b2020;
-      border: 1px solid #f2bcbc;
-    }
-
-    .result {
-      display: none;
-      margin-top: 18px;
+      margin-top: 20px;
       padding: 18px;
-      border-radius: 8px;
-      text-align: center;
-      border: 1px solid #dce5de;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f8faf8;
     }
 
-    .result h2 {
-      margin: 0 0 10px;
-      font-size: 23px;
+    .status-title {
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 8px;
     }
 
-    .result p {
-      margin: 7px 0;
-      overflow-wrap: anywhere;
+    .status-message {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
     }
 
-    .result.complete {
-      background: #e8f6ed;
-      color: #176534;
+    .status-complete {
+      background: #eaf6ee;
+      border-color: #b8dfc3;
+      color: #08783e;
     }
 
-    .result.missing {
-      background: #fff5df;
-      color: #805900;
+    .status-missing {
+      background: #fff5e8;
+      border-color: #f0d6a9;
+      color: #925600;
     }
 
-    .result.employee {
-      background: #fff5df;
-      color: #805900;
+    .status-error {
+      background: #fceeee;
+      border-color: #edc4c4;
+      color: #a32121;
     }
 
-    .divider {
-      margin: 22px 0;
-      border: 0;
-      border-top: 1px solid #e1e8e3;
+    .status-employee {
+      background: #fff5e8;
+      border-color: #f0d6a9;
+      color: #925600;
     }
 
-    .small-note {
-      font-size: 12px;
-      color: #68756d;
-      line-height: 1.5;
+    .result-detail {
       margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0,0,0,.1);
+      font-size: 13px;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .form-link {
+      display: inline-block;
+      margin-top: 13px;
+      padding: 12px 16px;
+      background: var(--green);
+      color: white;
+      text-decoration: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .form-link:hover {
+      background: var(--dark-green);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .instructions {
+      margin-top: 20px;
+      padding: 13px;
+      background: #f5f8f6;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
     }
 
     .footer {
       text-align: center;
       font-size: 11px;
-      color: #758078;
+      color: var(--muted);
       margin-top: 20px;
+      line-height: 1.6;
     }
 
-    .hidden {
-      display: none !important;
+    @media(max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -240,1209 +301,1325 @@
 
   <div class="header">
     <h2>DE LA SALLE UNIVERSITY</h2>
-    <h3>LAGUNA CAMPUS</h3>
-    <p>HEALTH SERVICES UNIT</p>
-    <hr style="border-color:rgba(255,255,255,.35);">
-    <h3>HSU VERIFICATION SYSTEM</h3>
-    <p>Student Health and Wellness Record</p>
+    <p>Laguna Campus</p>
+    <h3>Health Services Unit</h3>
+    <p>Universal Student and Employee Verification System</p>
     <p>Academic Year 2026–2027</p>
   </div>
 
+
   <div class="content">
 
+    <!-- ANNOUNCEMENT -->
+
     <div class="announcement">
-      <strong>ANNOUNCEMENT</strong><br>
-      Use this system to verify student SHWR submission or employee number records.
+
+      <strong>📢 ANNOUNCEMENT</strong>
+
+      Use this system to verify student SHWR submission
+      or employee identification records.
+
+      Select the appropriate verification type before
+      scanning or entering an identification number.
 
       <br><br>
-      Select the appropriate verification type before scanning or entering an identification number.
 
-      <br><br>
-      <strong>For Nursery to Grade 10:</strong>
-      If no SHWR has been submitted, please use this link:
+      <b>Students without SHWR submission:</b>
+
       <br>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfbll3hXaCLblPbklP8bSIrNChTAdqzs_FdGpK5zGx9KR57DQ/viewform" target="_blank">
-        SHWR Submission Form – Nursery to Grade 10
+
+      Nursery to Grade 10:
+      <a
+        href="https://docs.google.com/forms/d/e/1FAIpQLSfbll3hXaCLblPbklP8bSIrNChTAdqzs_FdGpK5zGx9KR57DQ/viewform"
+        target="_blank"
+        rel="noopener noreferrer">
+        SHWR Submission Form
       </a>
 
-      <br><br>
-      <strong>For Grade 11 to Grade 12:</strong>
       <br>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSe2NlxFvTF04m56fCnk6kyRcrMkCeBfggyf1F_H7w48LW_M9Q/viewform" target="_blank">
-        SHWR Submission Form – Grade 11 to Grade 12
+
+      Grade 11 to Grade 12:
+      <a
+        href="https://docs.google.com/forms/d/e/1FAIpQLSe2NlxFvTF04m56fCnk6kyRcrMkCeBfggyf1F_H7w48LW_M9Q/viewform"
+        target="_blank"
+        rel="noopener noreferrer">
+        SHWR Submission Form
       </a>
+
     </div>
 
-    <label for="verificationType">Verification Type</label>
+
+    <!-- VERIFICATION TYPE -->
+
+    <label for="verificationType">
+      Verification Type
+    </label>
+
     <select id="verificationType">
-      <option value="student">Student – SHWR Verification</option>
-      <option value="employee">Employee – Employee Clearance Verification</option>
+      <option value="student">
+        Student - SHWR Verification
+      </option>
+
+      <option value="employee">
+        Employee - Identification Verification
+      </option>
     </select>
 
-    <hr class="divider">
 
-    <label>NFC CARD SCANNER</label>
+    <!-- IDENTIFICATION NUMBER -->
 
-    <button class="btn-green" id="startNfcBtn" onclick="startNfc()">
-      SCAN NFC CARD
-    </button>
-
-    <button class="btn-gray hidden" id="stopNfcBtn" onclick="stopNfc()">
-      STOP NFC SCANNING
-    </button>
-
-    <div id="nfcStatus" class="status"></div>
-
-    <p class="small-note">
-      Place the NFC card near the NFC reader on your Android device.
-      Keep the card near the device until scanning is complete.
-    </p>
-
-    <hr class="divider">
-
-    <label>QR CODE / BARCODE SCANNER</label>
-
-    <button class="btn-dark" id="startCameraBtn" onclick="startCamera()">
-      OPEN CAMERA SCANNER
-    </button>
-
-    <button class="btn-gray hidden" id="stopCameraBtn" onclick="stopCamera()">
-      STOP CAMERA SCANNER
-    </button>
-
-    <div id="reader"></div>
-
-    <div id="cameraStatus" class="status"></div>
-
-    <hr class="divider">
-
-    <label for="manualId">MANUAL IDENTIFICATION NUMBER</label>
+    <label for="identifier">
+      Student ID / Employee ID
+    </label>
 
     <input
       type="text"
-      id="manualId"
-      placeholder="Enter Student ID or Employee ID"
+      id="identifier"
+      placeholder="Scan or enter identification number"
       autocomplete="off"
+      autocapitalize="characters"
+      spellcheck="false"
     >
 
-    <button class="btn-green" onclick="manualVerify()">
-      VERIFY IDENTIFICATION NUMBER
-    </button>
 
-    <div id="mainStatus" class="status"></div>
+    <!-- MANUAL VERIFICATION -->
 
-    <div id="result" class="result">
-      <h2 id="resultTitle"></h2>
-      <p id="resultId"></p>
-      <p id="resultMessage"></p>
-      <p id="resultInstruction"></p>
-      <a id="resultForm" class="hidden" target="_blank"></a>
+    <div class="button-group">
+
+      <button
+        class="primary"
+        id="verifyButton"
+        onclick="verifyManual()">
+        VERIFY ID
+      </button>
+
+      <button
+        class="secondary"
+        onclick="clearAll()">
+        CLEAR
+      </button>
+
     </div>
 
+
+    <!-- NFC SCANNING -->
+
+    <div class="button-group">
+
+      <button
+        class="nfc"
+        id="nfcButton"
+        onclick="startNFC()">
+        📳 SCAN NFC / RFID
+      </button>
+
+      <button
+        class="secondary"
+        onclick="stopNFC()">
+        STOP NFC
+      </button>
+
+    </div>
+
+
+    <!-- CAMERA SCANNING -->
+
+    <div class="button-group">
+
+      <button
+        class="camera"
+        onclick="startCamera()">
+        📷 SCAN QR / BARCODE
+      </button>
+
+      <button
+        class="stop"
+        onclick="stopCamera()">
+        STOP CAMERA
+      </button>
+
+    </div>
+
+
+    <div id="reader"></div>
+
+
+    <!-- LOADING -->
+
+    <div class="loading" id="loading">
+      Verifying identification number...
+    </div>
+
+
+    <!-- RESULT -->
+
+    <div class="status-box" id="resultBox">
+
+      <div class="status-title" id="resultTitle"></div>
+
+      <div class="status-message" id="resultMessage"></div>
+
+      <div class="result-detail" id="resultDetail"></div>
+
+      <div id="formContainer"></div>
+
+    </div>
+
+
+    <!-- INSTRUCTIONS -->
+
+    <div class="instructions">
+
+      <b>Verification Instructions</b>
+
+      <br>
+
+      1. Select Student or Employee verification.
+
+      <br>
+
+      2. Scan the identification card using NFC or camera,
+      or manually enter the identification number.
+
+      <br>
+
+      3. Wait for the verification result.
+
+      <br>
+
+      4. Follow the instructions displayed on the screen.
+
+      <br><br>
+
+      <b>Privacy Notice:</b>
+
+      This system is intended for identification and
+      verification purposes only. It does not display
+      personal information or confidential medical records.
+
+    </div>
+
+
     <div class="footer">
-      DE LA SALLE UNIVERSITY – LAGUNA CAMPUS<br>
-      HEALTH SERVICES UNIT
+
+      De La Salle University - Laguna Campus
+
+      <br>
+
+      Health Services Unit
+
+      <br>
+
+      Academic Year 2026–2027
+
     </div>
 
   </div>
+
 </div>
 
+
 <script>
+
 /***************************************************************
- * DE LA SALLE UNIVERSITY - LAGUNA CAMPUS
- * HEALTH SERVICES UNIT
- *
- * STUDENT HEALTH AND WELLNESS RECORD (SHWR)
- * NFC / RFID STUDENT AND EMPLOYEE VERIFICATION SYSTEM
- *
- * FRONTEND: HTML / JAVASCRIPT
- * CAMERA: HTML5-QRCODE
- * NFC: WEB NFC API
- * BACKEND: GOOGLE APPS SCRIPT
- * DATABASE: GOOGLE SHEETS
- *
- * API: JSONP
+ * 1. API CONFIGURATION
  ***************************************************************/
 
 const API_URL =
-  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycby6oV5yhwuxr83gUrXS9glFVzi466mvGNdVqJl7RKCGkH19oAxgMgbHX60uicrZMHhDAA/exec";
+  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbwjdjJFejbzNy4158LsLNwVrKw1AdXDVdTaL9g6iTCwkHovPguguZYLN5XgXy9gyqc7PQ/exec";
 
-const STUDENT_FORM_NURSERY_G10 =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfbll3hXaCLblPbklP8bSIrNChTAdqzs_FdGpK5zGx9KR57DQ/viewform";
 
-const STUDENT_FORM_GRADE_11_12 =
-  "https://docs.google.com/forms/d/e/1FAIpQLSe2NlxFvTF04m56fCnk6kyRcrMkCeBfggyf1F_H7w48LW_M9Q/viewform";
+/***************************************************************
+ * 2. GLOBAL VARIABLES
+ ***************************************************************/
 
-let nfcReader = null;
-let nfcController = null;
 let html5QrCode = null;
-let isCameraRunning = false;
-let isNfcRunning = false;
+let nfcReader = null;
+let nfcAbortController = null;
 let isVerifying = false;
 
 
-/* ============================================================
-   BASIC HELPERS
-============================================================ */
+/***************************************************************
+ * 3. IDENTIFICATION NUMBER CLEANER
+ ***************************************************************/
 
-function $(id) {
-  return document.getElementById(id);
-}
+function cleanIdentifier(value) {
 
-function normalizeID(value) {
   return String(value || "")
     .trim()
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, "");
-}
 
-function showStatus(elementId, message, type) {
-  const element = $(elementId);
-
-  element.className = "status " + (type || "info");
-  element.textContent = message;
-  element.style.display = "block";
-}
-
-function hideStatus(elementId) {
-  const element = $(elementId);
-
-  element.textContent = "";
-  element.className = "status";
-  element.style.display = "none";
-}
-
-function hideResult() {
-  $("result").style.display = "none";
-  $("result").className = "result";
-  $("resultTitle").textContent = "";
-  $("resultId").textContent = "";
-  $("resultMessage").textContent = "";
-  $("resultInstruction").textContent = "";
-
-  $("resultForm").classList.add("hidden");
-  $("resultForm").removeAttribute("href");
-}
-
-function showNoNfcIdFound() {
-  hideResult();
-
-  showStatus(
-    "nfcStatus",
-    "NFC CARD DETECTED, BUT NO ID WAS FOUND.",
-    "warning"
-  );
 }
 
 
-/* ============================================================
-   NFC IDENTIFICATION LABELS
-============================================================ */
+/***************************************************************
+ * 4. VALIDATE IDENTIFICATION NUMBER
+ ***************************************************************/
 
-const ID_LABELS = [
-  "employeeid",
-  "employeeids",
-  "employeenumber",
-  "employeeno",
-  "employee",
-  "empid",
-  "empno",
-  "staffid",
-  "staffnumber",
-  "staffno",
-  "personnelid",
-  "personnelnumber",
-  "personnelno",
-  "studentid",
-  "studentids",
-  "studentnumber",
-  "studentno",
-  "student",
-  "learnerid",
-  "learnernumber",
-  "learnerno",
-  "schoolid",
-  "schoolnumber",
-  "schoolno",
-  "school",
-  "identificationnumber",
-  "identificationno",
-  "identification",
-  "idnumber",
-  "idno",
-  "idnum",
-  "id",
-  "cardid",
-  "cardnumber",
-  "cardno",
-  "cardnum",
-  "card",
-  "rfidnumber",
-  "rfidid",
-  "rfid",
-  "nfcid",
-  "nfcnumber",
-  "nfc",
-  "badgeid",
-  "badgenumber",
-  "badgeno",
-  "badge",
-  "userid",
-  "usernumber",
-  "userno",
-  "user",
-  "uid",
-  "serialnumber",
-  "serialno",
-  "serial",
-  "referencenumber",
-  "referenceno",
-  "reference",
-  "registrationnumber",
-  "registrationno",
-  "registration",
-  "accountnumber",
-  "accountno",
-  "account",
-  "memberid",
-  "membernumber",
-  "memberno",
-  "member",
-  "campusid",
-  "campusnumber",
-  "campus",
-  "recordid",
-  "recordnumber",
-  "barcodeid",
-  "barcodenumber",
-  "barcode",
-  "number"
-];
+function isValidIdentifier(value) {
 
-function normalizeLabel(label) {
-  return String(label || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
+  const id = cleanIdentifier(value);
+
+  return id.length >= 6 && id.length <= 40;
+
 }
 
-function isIdLabel(label) {
-  const key = normalizeLabel(label);
 
-  if (ID_LABELS.includes(key)) {
-    return true;
+/***************************************************************
+ * 5. EXTRACT LABELLED IDENTIFICATION NUMBER
+ *
+ * Supports:
+ * - Student ID
+ * - Student Number
+ * - Employee ID
+ * - Employee Number
+ * - Employee No
+ * - Personnel Number
+ * - Card ID
+ * - UID
+ ***************************************************************/
+
+function extractLabelledIdentifier(value) {
+
+  const text = String(value || "");
+
+  const labels = [
+    "employee id",
+    "employee number",
+    "employee no",
+    "employeeid",
+    "employeenumber",
+    "personnel number",
+    "personnel id",
+    "student id",
+    "student number",
+    "studentid",
+    "studentnumber",
+    "identification number",
+    "identification no",
+    "id number",
+    "id no",
+    "card id",
+    "card number",
+    "card no",
+    "uid"
+  ];
+
+  for (const label of labels) {
+
+    const escaped = label.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
+
+    const pattern = new RegExp(
+      "(?:^|[\\s,;|])" +
+      escaped +
+      "\\s*[:=#\\-]?\\s*([A-Z0-9][A-Z0-9\\- ]{4,38})",
+      "i"
+    );
+
+    const match = text.match(pattern);
+
+    if (match && match[1]) {
+
+      const candidate = cleanIdentifier(
+        match[1]
+      );
+
+      if (isValidIdentifier(candidate)) {
+        return candidate;
+      }
+
+    }
+
   }
 
-  return (
-    /(^|)(student|employee|staff|personnel|learner|school|card|rfid|nfc|badge|user|member|campus|record|serial|identification|registration|account|barcode)/i.test(key) &&
-    /(id|no|num|number|uid|code|serial|card|rfid|nfc)/i.test(key)
-  );
+  return "";
+
 }
 
 
-/* ============================================================
-   IDENTIFIER EXTRACTION
-============================================================ */
+/***************************************************************
+ * 6. EXTRACT ID FROM JSON DATA
+ ***************************************************************/
 
-function cleanIdentifier(value) {
+function extractFromJSON(value) {
+
+  try {
+
+    const data = JSON.parse(value);
+
+    if (typeof data === "string") {
+      return extractIdentifier(data);
+    }
+
+    if (typeof data === "object" && data !== null) {
+
+      const keys = [
+        "employeeid",
+        "employee_id",
+        "employee number",
+        "employeenumber",
+        "personnelnumber",
+        "personnel_id",
+        "studentid",
+        "student_id",
+        "studentnumber",
+        "student_number",
+        "idnumber",
+        "id_number",
+        "cardid",
+        "card_id",
+        "uid",
+        "id"
+      ];
+
+      for (const key of keys) {
+
+        for (const actualKey of Object.keys(data)) {
+
+          if (
+            actualKey.toLowerCase() === key.toLowerCase()
+          ) {
+
+            const candidate = cleanIdentifier(
+              data[actualKey]
+            );
+
+            if (isValidIdentifier(candidate)) {
+              return candidate;
+            }
+
+          }
+
+        }
+
+      }
+
+      for (const item of Object.values(data)) {
+
+        if (typeof item === "string") {
+
+          const result = extractIdentifier(item);
+
+          if (result) {
+            return result;
+          }
+
+        }
+
+      }
+
+    }
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+  return "";
+
+}
+
+
+/***************************************************************
+ * 7. GENERIC IDENTIFICATION EXTRACTION
+ *
+ * Supports numeric and alphanumeric IDs.
+ ***************************************************************/
+
+function extractGenericIdentifier(value) {
+
+  const text = String(value || "").trim();
+
+  // Numeric identification number
+  const numericMatches = text.match(
+    /\b\d{6,30}\b/g
+  );
+
+  if (numericMatches && numericMatches.length) {
+
+    return cleanIdentifier(
+      numericMatches[0]
+    );
+
+  }
+
+  // Alphanumeric identification number
+  const alphanumericMatches = text.match(
+    /\b[A-Z0-9][A-Z0-9-]{5,39}\b/gi
+  );
+
+  if (alphanumericMatches && alphanumericMatches.length) {
+
+    return cleanIdentifier(
+      alphanumericMatches[0]
+    );
+
+  }
+
+  return "";
+
+}
+
+
+/***************************************************************
+ * 8. UNIVERSAL IDENTIFICATION EXTRACTOR
+ ***************************************************************/
+
+function extractIdentifier(value) {
+
   if (value === null || value === undefined) {
     return "";
   }
 
-  let result = String(value).trim();
+  const text = String(value).trim();
 
-  result = result
-    .replace(/^[\s"'`]+|[\s"'`]+$/g, "")
-    .replace(/[\r\n\t]/g, " ")
-    .trim();
-
-  if (!result) {
+  if (!text) {
     return "";
   }
 
-  /*
-   * Preserve the original ID format.
-   * Do not convert IDs to Number because leading zeros matter.
-   */
-  const normalized = normalizeID(result);
 
-  if (normalized.length < 6 || normalized.length > 40) {
-    return "";
+  // CHECK LABELLED IDENTIFICATION NUMBER
+
+  const labelled = extractLabelledIdentifier(text);
+
+  if (labelled) {
+    return labelled;
   }
 
-  return normalized;
-}
 
-function extractLabelledIdentifier(text) {
-  if (!text) return "";
+  // CHECK JSON
 
-  const labelPattern =
-    "(?:employee\\s*(?:id|number|no\\.?|#)|emp\\s*(?:id|no\\.?|#)|" +
-    "student\\s*(?:id|number|no\\.?|#)|staff\\s*(?:id|number|no\\.?|#)|" +
-    "personnel\\s*(?:id|number|no\\.?|#)|learner\\s*(?:id|number|no\\.?|#)|" +
-    "school\\s*(?:id|number|no\\.?|#)|identification\\s*(?:number|no\\.?|#)|" +
-    "id\\s*(?:number|no\\.?|num\\.?|#)|card\\s*(?:id|number|no\\.?|#)|" +
-    "rfid\\s*(?:id|number|no\\.?|#)?|nfc\\s*(?:id|number|no\\.?|#)?|" +
-    "badge\\s*(?:id|number|no\\.?|#)?|user\\s*(?:id|number|no\\.?|#)|" +
-    "uid|serial\\s*(?:number|no\\.?|#)?|reference\\s*(?:number|no\\.?|#)|" +
-    "registration\\s*(?:number|no\\.?|#)|account\\s*(?:number|no\\.?|#)|" +
-    "member\\s*(?:id|number|no\\.?|#)|campus\\s*(?:id|number|no\\.?|#)|" +
-    "record\\s*(?:id|number|no\\.?|#)|barcode\\s*(?:id|number|no\\.?|#)?)";
+  if (
+    text.startsWith("{") ||
+    text.startsWith("[")
+  ) {
 
-  const regex = new RegExp(
-    "(?:^|[\\s,;|{}\\[\\]])" +
-    labelPattern +
-    "\\s*[:=#\\-]?\\s*([A-Z0-9][A-Z0-9\\-]{5,39})",
-    "i"
-  );
+    const jsonID = extractFromJSON(text);
 
-  const match = String(text).match(regex);
-
-  if (match && match[1]) {
-    return cleanIdentifier(match[1]);
-  }
-
-  return "";
-}
-
-function extractGenericIdentifier(text) {
-  if (!text) return "";
-
-  const value = String(text);
-
-  /*
-   * First find a continuous numeric ID of at least six digits.
-   */
-  const numericMatches = value.match(/\d{6,}/g);
-
-  if (numericMatches && numericMatches.length) {
-    for (const item of numericMatches) {
-      const candidate = cleanIdentifier(item);
-
-      if (candidate) return candidate;
-    }
-  }
-
-  /*
-   * Also support alphanumeric IDs such as:
-   * EMP001234, STU2026001, DLSU-123456.
-   */
-  const alphanumericMatches =
-    value.match(/\b[A-Z]{1,8}[- ]?\d{6,}\b/gi);
-
-  if (alphanumericMatches && alphanumericMatches.length) {
-    for (const item of alphanumericMatches) {
-      const candidate = cleanIdentifier(item);
-
-      if (candidate) return candidate;
-    }
-  }
-
-  return "";
-}
-
-
-/* ============================================================
-   JSON / OBJECT IDENTIFIER EXTRACTION
-============================================================ */
-
-function extractFromObject(object) {
-  if (!object || typeof object !== "object") {
-    return "";
-  }
-
-  /*
-   * Search ID-labelled fields first.
-   */
-  for (const key of Object.keys(object)) {
-    if (isIdLabel(key)) {
-      const value = object[key];
-
-      if (typeof value === "string" || typeof value === "number") {
-        const candidate = cleanIdentifier(value);
-
-        if (candidate) return candidate;
-      }
-    }
-  }
-
-  /*
-   * Then recursively inspect nested objects and arrays.
-   */
-  for (const key of Object.keys(object)) {
-    const value = object[key];
-
-    if (value && typeof value === "object") {
-      const candidate = extractFromObject(value);
-
-      if (candidate) return candidate;
-    }
-  }
-
-  /*
-   * Finally inspect string values for labelled IDs.
-   */
-  for (const key of Object.keys(object)) {
-    const value = object[key];
-
-    if (typeof value === "string") {
-      const labelled = extractLabelledIdentifier(value);
-
-      if (labelled) return labelled;
-    }
-  }
-
-  return "";
-}
-
-function extractFromText(text) {
-  if (!text) return "";
-
-  const value = String(text).trim();
-
-  if (!value) return "";
-
-  /*
-   * JSON content.
-   */
-  try {
-    const parsed = JSON.parse(value);
-
-    const objectID = extractFromObject(parsed);
-
-    if (objectID) return objectID;
-  } catch (error) {
-    // Continue checking ordinary text.
-  }
-
-  /*
-   * URL query parameters.
-   */
-  try {
-    const url = new URL(value);
-
-    for (const [key, parameterValue] of url.searchParams.entries()) {
-      if (isIdLabel(key)) {
-        const candidate = cleanIdentifier(parameterValue);
-
-        if (candidate) return candidate;
-      }
+    if (jsonID) {
+      return jsonID;
     }
 
-    const pathCandidate = extractLabelledIdentifier(url.pathname);
-
-    if (pathCandidate) return pathCandidate;
-
-  } catch (error) {
-    // Not a URL. Continue.
   }
 
-  /*
-   * Labelled ID has priority over generic numbers.
-   */
-  const labelled = extractLabelledIdentifier(value);
 
-  if (labelled) return labelled;
-
-  return extractGenericIdentifier(value);
-}
-
-
-/* ============================================================
-   NDEF RECORD DECODING
-============================================================ */
-
-function decodeNdefPayload(record) {
-  if (!record || !record.data) {
-    return "";
-  }
+  // CHECK URL PARAMETERS
 
   try {
-    const data = record.data;
 
-    if (typeof data === "string") {
-      return data;
-    }
-
-    const bytes = new Uint8Array(data);
-
-    if (!bytes.length) {
-      return "";
-    }
-
-    /*
-     * NDEF TEXT RECORD
-     * First byte contains status and language length.
-     */
     if (
-      record.recordType === "text" ||
-      record.recordType === "T"
+      text.startsWith("http://") ||
+      text.startsWith("https://")
     ) {
-      const languageLength = bytes[0] & 0x3F;
-      const textBytes = bytes.slice(1 + languageLength);
 
-      return new TextDecoder("utf-8").decode(textBytes);
-    }
+      const url = new URL(text);
 
-    /*
-     * NDEF URL RECORD
-     * First byte represents the URI prefix.
-     */
-    if (
-      record.recordType === "url" ||
-      record.recordType === "U"
-    ) {
-      const prefixes = [
-        "",
-        "http://www.",
-        "https://www.",
-        "http://",
-        "https://",
-        "tel:",
-        "mailto:",
-        "ftp://anonymous:anonymous@",
-        "ftp://ftp.",
-        "ftps://",
-        "sftp://",
-        "smb://",
-        "nfs://",
-        "ftp://",
-        "dav://",
-        "news:",
-        "telnet://",
-        "imap:",
-        "rtsp://",
-        "urn:",
-        "pop:",
-        "sip:",
-        "sips:",
-        "tftp:",
-        "btspp://",
-        "btl2cap://",
-        "btgoep://",
-        "tcpobex://",
-        "irdaobex://",
-        "file://",
-        "urn:epc:id:",
-        "urn:epc:tag:",
-        "urn:epc:pat:",
-        "urn:epc:raw:",
-        "urn:epc:",
-        "urn:nfc:"
+      const parameters = [
+        "employeeid",
+        "employee_id",
+        "employeenumber",
+        "employee_number",
+        "studentid",
+        "student_id",
+        "studentnumber",
+        "student_number",
+        "id",
+        "uid",
+        "cardid"
       ];
 
-      const prefix = prefixes[bytes[0]] || "";
-      const remainder = new TextDecoder("utf-8")
-        .decode(bytes.slice(1));
+      for (const parameter of parameters) {
 
-      return prefix + remainder;
-    }
+        const value = url.searchParams.get(
+          parameter
+        );
 
-    /*
-     * MIME, external, absolute-url and unknown records.
-     * Attempt UTF-8 decoding.
-     */
-    return new TextDecoder("utf-8", {
-      fatal: false
-    }).decode(bytes);
+        if (value) {
 
-  } catch (error) {
-    console.warn("NDEF payload decoding failed:", error);
-    return "";
-  }
-}
+          const candidate = cleanIdentifier(value);
 
+          if (isValidIdentifier(candidate)) {
+            return candidate;
+          }
 
-/* ============================================================
-   SCAN ALL NDEF RECORDS
-============================================================ */
+        }
 
-function extractIdentifierFromNdef(message) {
-  if (!message || !message.records) {
-    return "";
-  }
-
-  const labelledCandidates = [];
-  const genericCandidates = [];
-
-  for (const record of message.records) {
-    try {
-      const decoded = decodeNdefPayload(record);
-
-      console.log("NFC RECORD:", {
-        recordType: record.recordType,
-        mediaType: record.mediaType,
-        id: record.id,
-        decodedContent: decoded
-      });
-
-      if (!decoded) continue;
-
-      /*
-       * Check labelled identifier first.
-       */
-      const labelled = extractLabelledIdentifier(decoded);
-
-      if (labelled) {
-        labelledCandidates.push(labelled);
-        continue;
       }
 
-      /*
-       * Check JSON, URL and ordinary text.
-       */
-      const extracted = extractFromText(decoded);
-
-      if (extracted) {
-        genericCandidates.push(extracted);
-      }
-
-    } catch (error) {
-      console.warn("Unable to process NFC record:", error);
     }
+
+  } catch (error) {}
+
+
+  // CHECK RAW VALUE
+
+  const direct = cleanIdentifier(text);
+
+  if (isValidIdentifier(direct)) {
+    return direct;
   }
 
-  /*
-   * Explicitly labelled ID always has priority.
-   */
-  if (labelledCandidates.length) {
-    return labelledCandidates[0];
-  }
 
-  /*
-   * Otherwise use the first valid ID found.
-   */
-  if (genericCandidates.length) {
-    return genericCandidates[0];
+  // CHECK GENERIC PATTERNS
+
+  const generic = extractGenericIdentifier(text);
+
+  if (
+    generic &&
+    isValidIdentifier(generic)
+  ) {
+
+    return generic;
+
   }
 
   return "";
+
 }
 
 
-/* ============================================================
-   NFC SCANNING
-============================================================ */
+/***************************************************************
+ * 9. MANUAL VERIFICATION
+ ***************************************************************/
 
-async function startNfc() {
-  hideStatus("nfcStatus");
-  hideResult();
+function verifyManual() {
 
-  if (!("NDEFReader" in window)) {
-    showStatus(
-      "nfcStatus",
-      "NFC IS NOT SUPPORTED BY THIS BROWSER OR DEVICE. Please use a compatible Android device with Chrome and NFC enabled.",
-      "error"
-    );
-
-    return;
-  }
-
-  try {
-    nfcReader = new NDEFReader();
-    nfcController = new AbortController();
-
-    nfcReader.addEventListener("reading", function(event) {
-
-      console.log("NFC CARD DETECTED");
-      console.log("NFC SERIAL NUMBER:", event.serialNumber);
-      console.log("NFC MESSAGE:", event.message);
-
-      /*
-       * Search all supported NDEF records.
-       */
-      const identifier = extractIdentifierFromNdef(
-        event.message
-      );
-
-      if (!identifier) {
-        /*
-         * IMPORTANT:
-         * Do not call the API.
-         * Do not display NOT FOUND.
-         * Only show the requested NFC message.
-         */
-        showNoNfcIdFound();
-        return;
-      }
-
-      stopNfc();
-
-      showStatus(
-        "nfcStatus",
-        "NFC ID FOUND: " + identifier,
-        "success"
-      );
-
-      const selectedType = $("verificationType").value;
-
-      verifyIdentifier(identifier, selectedType);
-
-    });
-
-    nfcReader.addEventListener("readingerror", function() {
-      showStatus(
-        "nfcStatus",
-        "NFC CARD DETECTED, BUT NO ID WAS FOUND.",
-        "warning"
-      );
-    });
-
-    await nfcReader.scan({
-      signal: nfcController.signal
-    });
-
-    isNfcRunning = true;
-
-    $("startNfcBtn").classList.add("hidden");
-    $("stopNfcBtn").classList.remove("hidden");
-
-    showStatus(
-      "nfcStatus",
-      "READY TO SCAN. PLACE YOUR NFC CARD NEAR YOUR DEVICE.",
-      "info"
-    );
-
-  } catch (error) {
-    console.error("NFC error:", error);
-
-    showStatus(
-      "nfcStatus",
-      "Unable to start NFC scanning. " +
-      (error.message || "Check NFC permission and device compatibility."),
-      "error"
-    );
-
-    stopNfc();
-  }
-}
-
-function stopNfc() {
-  try {
-    if (nfcController) {
-      nfcController.abort();
-    }
-  } catch (error) {
-    console.warn(error);
-  }
-
-  nfcController = null;
-  nfcReader = null;
-  isNfcRunning = false;
-
-  $("startNfcBtn").classList.remove("hidden");
-  $("stopNfcBtn").classList.add("hidden");
-}
-
-
-/* ============================================================
-   CAMERA QR / BARCODE SCANNER
-============================================================ */
-
-async function startCamera() {
-  hideStatus("cameraStatus");
-  hideResult();
-
-  if (typeof Html5Qrcode === "undefined") {
-    showStatus(
-      "cameraStatus",
-      "CAMERA SCANNER LIBRARY COULD NOT BE LOADED.",
-      "error"
-    );
-
-    return;
-  }
-
-  try {
-    html5QrCode = new Html5Qrcode("reader");
-
-    const config = {
-      fps: 10,
-      qrbox: {
-        width: 250,
-        height: 180
-      },
-      aspectRatio: 1.0
-    };
-
-    const cameras = await Html5Qrcode.getCameras();
-
-    if (!cameras || !cameras.length) {
-      throw new Error("No camera was detected.");
-    }
-
-    let selectedCamera = cameras.find(camera =>
-      /back|rear|environment/i.test(camera.label)
-    );
-
-    if (!selectedCamera) {
-      selectedCamera = cameras[cameras.length - 1];
-    }
-
-    await html5QrCode.start(
-      selectedCamera.id,
-      config,
-      function(decodedText) {
-        const identifier = extractFromText(decodedText);
-
-        if (!identifier) {
-          showStatus(
-            "cameraStatus",
-            "CODE DETECTED, BUT NO VALID ID WAS FOUND.",
-            "warning"
-          );
-
-          return;
-        }
-
-        stopCamera();
-
-        verifyIdentifier(
-          identifier,
-          $("verificationType").value
-        );
-      },
-      function() {
-        // Ignore continuous camera scan errors.
-      }
-    );
-
-    isCameraRunning = true;
-
-    $("startCameraBtn").classList.add("hidden");
-    $("stopCameraBtn").classList.remove("hidden");
-
-    showStatus(
-      "cameraStatus",
-      "CAMERA SCANNER IS READY.",
-      "info"
-    );
-
-  } catch (error) {
-    console.error(error);
-
-    showStatus(
-      "cameraStatus",
-      "Unable to start camera scanner: " +
-      (error.message || error),
-      "error"
-    );
-
-    stopCamera();
-  }
-}
-
-async function stopCamera() {
-  try {
-    if (html5QrCode && isCameraRunning) {
-      await html5QrCode.stop();
-      await html5QrCode.clear();
-    }
-  } catch (error) {
-    console.warn(error);
-  }
-
-  html5QrCode = null;
-  isCameraRunning = false;
-
-  $("startCameraBtn").classList.remove("hidden");
-  $("stopCameraBtn").classList.add("hidden");
-}
-
-
-/* ============================================================
-   MANUAL ID VERIFICATION
-============================================================ */
-
-function manualVerify() {
-  const identifier = normalizeID($("manualId").value);
-
-  if (!identifier || identifier.length < 6) {
-    showStatus(
-      "mainStatus",
-      "PLEASE ENTER A VALID IDENTIFICATION NUMBER.",
-      "error"
-    );
-
-    return;
-  }
-
-  hideResult();
-
-  verifyIdentifier(
-    identifier,
-    $("verificationType").value
+  const input = document.getElementById(
+    "identifier"
   );
-}
 
+  const id = extractIdentifier(input.value);
 
-/* ============================================================
-   GOOGLE APPS SCRIPT JSONP API
-============================================================ */
+  if (!id || !isValidIdentifier(id)) {
 
-function verifyIdentifier(identifier, type) {
-  if (isVerifying) return;
-
-  const cleanID = normalizeID(identifier);
-
-  if (!cleanID || cleanID.length < 6) {
-    showStatus(
-      "mainStatus",
-      "PLEASE PROVIDE A VALID IDENTIFICATION NUMBER.",
+    showResult(
+      "INVALID ID",
+      "Please enter a valid student or employee identification number.",
       "error"
     );
 
     return;
+
+  }
+
+  input.value = id;
+
+  verifyIdentifier(id);
+
+}
+
+
+/***************************************************************
+ * 10. VERIFY IDENTIFICATION NUMBER
+ ***************************************************************/
+
+function verifyIdentifier(id) {
+
+  if (isVerifying) {
+    return;
+  }
+
+  const cleanID = cleanIdentifier(id);
+
+  if (!isValidIdentifier(cleanID)) {
+
+    showResult(
+      "INVALID ID",
+      "The identification number is not valid.",
+      "error"
+    );
+
+    return;
+
   }
 
   isVerifying = true;
 
-  hideResult();
+  const type = document.getElementById(
+    "verificationType"
+  ).value;
 
-  showStatus(
-    "mainStatus",
-    "VERIFYING IDENTIFICATION NUMBER...",
-    "info"
-  );
+  document.getElementById(
+    "identifier"
+  ).value = cleanID;
+
+  document.getElementById(
+    "loading"
+  ).style.display = "block";
+
+  document.getElementById(
+    "resultBox"
+  ).style.display = "none";
 
   const callbackName =
-    "hsuCallback_" + Date.now() + "_" +
+    "hsuCallback_" +
+    Date.now() +
+    "_" +
     Math.floor(Math.random() * 100000);
 
   const script = document.createElement("script");
 
-  const timeout = setTimeout(function() {
-    cleanup();
+  let completed = false;
 
-    showStatus(
-      "mainStatus",
-      "VERIFICATION TIMED OUT. PLEASE TRY AGAIN.",
-      "error"
-    );
-
-    isVerifying = false;
-  }, 15000);
+  let timeout;
 
   function cleanup() {
+
+    if (completed) {
+      return;
+    }
+
+    completed = true;
+
     clearTimeout(timeout);
+
+    delete window[callbackName];
 
     if (script.parentNode) {
       script.parentNode.removeChild(script);
     }
 
-    try {
-      delete window[callbackName];
-    } catch (error) {
-      window[callbackName] = undefined;
-    }
-  }
+    document.getElementById(
+      "loading"
+    ).style.display = "none";
 
-  window[callbackName] = function(response) {
-    cleanup();
     isVerifying = false;
 
-    if (!response) {
-      showStatus(
-        "mainStatus",
-        "NO RESPONSE WAS RECEIVED FROM THE VERIFICATION SYSTEM.",
+  }
+
+
+  window[callbackName] = function(response) {
+
+    cleanup();
+
+    if (!response || !response.success) {
+
+      showResult(
+        response && response.status
+          ? response.status
+          : "ERROR",
+
+        response && response.message
+          ? response.message
+          : "Unable to verify the identification number.",
+
         "error"
       );
 
       return;
+
     }
 
-    console.log("HSU API RESPONSE:", response);
+    displayVerificationResult(
+      response,
+      type
+    );
 
-    displayVerificationResult(response, cleanID, type);
   };
 
-  script.onerror = function() {
-    cleanup();
-    isVerifying = false;
 
-    showStatus(
-      "mainStatus",
-      "UNABLE TO CONNECT TO THE VERIFICATION SYSTEM.",
+  timeout = setTimeout(function() {
+
+    cleanup();
+
+    showResult(
+      "CONNECTION TIMEOUT",
+      "The verification service did not respond. Please try again.",
       "error"
     );
+
+  }, 15000);
+
+
+  const parameters = new URLSearchParams({
+
+    action: "verify",
+
+    id: cleanID,
+
+    type: type,
+
+    callback: callbackName
+
+  });
+
+
+  script.src =
+    API_URL +
+    "?" +
+    parameters.toString();
+
+  script.onerror = function() {
+
+    cleanup();
+
+    showResult(
+      "CONNECTION ERROR",
+      "Unable to connect to the HSU verification service. Please check the connection or contact the Health Services Unit.",
+      "error"
+    );
+
   };
 
-  const url =
-    API_URL +
-    "?action=verify" +
-    "&id=" + encodeURIComponent(cleanID) +
-    "&type=" + encodeURIComponent(type) +
-    "&callback=" + encodeURIComponent(callbackName);
-
-  script.src = url;
 
   document.body.appendChild(script);
+
 }
 
 
-/* ============================================================
-   DISPLAY VERIFICATION RESULT
-============================================================ */
+/***************************************************************
+ * 11. DISPLAY VERIFICATION RESULT
+ ***************************************************************/
 
-function displayVerificationResult(response, identifier, type) {
-  hideStatus("mainStatus");
+function displayVerificationResult(
+  response,
+  type
+) {
 
-  const result = $("result");
-
-  result.style.display = "block";
-
-  $("resultId").textContent =
-    "Identification Number: " + identifier;
-
-  $("resultForm").classList.add("hidden");
-
-  if (type === "employee") {
-    displayEmployeeResult(response);
-  } else {
-    displayStudentResult(response);
-  }
-}
-
-
-/* ============================================================
-   STUDENT RESULT
-============================================================ */
-
-function displayStudentResult(response) {
   const status = String(
-    response.status || response.result || ""
+    response.status || ""
   ).toUpperCase();
 
-  const result = $("result");
+  const id = type === "employee"
+    ? response.employeeId || ""
+    : response.studentId || "";
 
-  if (status === "WITH SHWR") {
-    result.className = "result complete";
 
-    $("resultTitle").textContent = "WITH SHWR";
+  if (type === "student") {
 
-    $("resultMessage").textContent =
-      "Student Health and Wellness Record submission was found.";
+    if (status === "WITH SHWR") {
 
-    $("resultInstruction").textContent =
-      "No further submission is required at this time.";
+      showResult(
+        "SHWR SUBMISSION FOUND",
+        "The Student Health and Wellness Record submission has been successfully located.",
+        "complete",
+        "Student ID: " + id
+      );
 
-    return;
-  }
+      return;
 
-  if (status === "NO SHWR") {
-    result.className = "result missing";
-
-    $("resultTitle").textContent = "NO SHWR";
-
-    $("resultMessage").textContent =
-      "No Student Health and Wellness Record submission was found.";
-
-    $("resultInstruction").textContent =
-      "Please accomplish the appropriate SHWR submission form.";
-
-    const formUrl = response.formUrl || "";
-
-    const allowedForms = [
-      STUDENT_FORM_NURSERY_G10,
-      STUDENT_FORM_GRADE_11_12
-    ];
-
-    if (allowedForms.includes(formUrl)) {
-      const link = $("resultForm");
-
-      link.href = formUrl;
-      link.textContent = "OPEN SHWR SUBMISSION FORM";
-      link.classList.remove("hidden");
     }
 
-    return;
+
+    if (status === "NO SHWR") {
+
+      showResult(
+        "NO SHWR SUBMISSION",
+        response.message ||
+          "No SHWR submission was found.",
+        "missing",
+        "Student ID: " + id +
+        (
+          response.gradeLevel
+            ? "\nGrade Level: " + response.gradeLevel
+            : ""
+        )
+      );
+
+
+      // DISPLAY APPROPRIATE FORM
+
+      if (response.formUrl) {
+
+        const container = document.getElementById(
+          "formContainer"
+        );
+
+        const link = document.createElement("a");
+
+        link.href = response.formUrl;
+
+        link.target = "_blank";
+
+        link.rel = "noopener noreferrer";
+
+        link.className = "form-link";
+
+        link.textContent =
+          "OPEN " +
+          (response.formType || "SHWR") +
+          " SUBMISSION FORM";
+
+        container.appendChild(link);
+
+      }
+
+      return;
+
+    }
+
   }
 
-  result.className = "result missing";
 
-  $("resultTitle").textContent =
-    status || "UNABLE TO VERIFY";
+  if (type === "employee") {
 
-  $("resultMessage").textContent =
-    response.message || "The student record could not be verified.";
+    if (status === "VERIFIED") {
 
-  $("resultInstruction").textContent =
-    "Please coordinate with the Health Services Unit.";
+      showResult(
+        "EMPLOYEE RECORD FOUND",
+        "An employee identification record was found. Please coordinate with the Health Services Unit for clearance verification.",
+        "employee",
+        "Employee ID: " + id +
+        "\nStatus: NOT CLEARED"
+      );
+
+      return;
+
+    }
+
+
+    if (status === "NOT FOUND") {
+
+      showResult(
+        "NO OUTSTANDING RECORD FOUND",
+        "No matching employee identification record was found in the verification database.",
+        "complete",
+        "Employee ID: " + id +
+        "\nStatus: CLEARED"
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  showResult(
+    status || "UNKNOWN STATUS",
+    response.message || "Verification completed.",
+    "error"
+  );
+
 }
 
 
-/* ============================================================
-   EMPLOYEE RESULT
-============================================================ */
+/***************************************************************
+ * 12. SHOW RESULT
+ ***************************************************************/
 
-function displayEmployeeResult(response) {
-  const status = String(
-    response.status || response.result || ""
-  ).toUpperCase();
+function showResult(
+  title,
+  message,
+  statusType,
+  detail
+) {
 
-  const result = $("result");
+  const box = document.getElementById(
+    "resultBox"
+  );
 
-  if (status === "VERIFIED") {
-    result.className = "result employee";
+  const titleElement = document.getElementById(
+    "resultTitle"
+  );
 
-    $("resultTitle").textContent = "NOT CLEARED";
+  const messageElement = document.getElementById(
+    "resultMessage"
+  );
 
-    $("resultMessage").textContent =
-      "Employee record found.";
+  const detailElement = document.getElementById(
+    "resultDetail"
+  );
 
-    $("resultInstruction").textContent =
-      "Please coordinate with the Health Services Unit for verification.";
+  const formContainer = document.getElementById(
+    "formContainer"
+  );
 
-    return;
+
+  box.className = "status-box";
+
+  if (statusType === "complete") {
+
+    box.classList.add("status-complete");
+
+  } else if (statusType === "missing") {
+
+    box.classList.add("status-missing");
+
+  } else if (statusType === "employee") {
+
+    box.classList.add("status-employee");
+
+  } else {
+
+    box.classList.add("status-error");
+
   }
 
-  if (status === "NOT FOUND") {
-    result.className = "result complete";
 
-    $("resultTitle").textContent = "CLEARED";
+  titleElement.textContent = title;
 
-    $("resultMessage").textContent =
-      "No outstanding clinic record was found.";
+  messageElement.textContent = message;
 
-    $("resultInstruction").textContent =
-      "No further action is required.";
+  detailElement.textContent = detail || "";
 
-    return;
-  }
+  formContainer.replaceChildren();
 
-  result.className = "result missing";
+  box.style.display = "block";
 
-  $("resultTitle").textContent =
-    status || "UNABLE TO VERIFY";
-
-  $("resultMessage").textContent =
-    response.message || "Employee record could not be verified.";
-
-  $("resultInstruction").textContent =
-    "Please coordinate with the Health Services Unit.";
 }
 
 
-/* ============================================================
-   RESET WHEN VERIFICATION TYPE CHANGES
-============================================================ */
+/***************************************************************
+ * 13. NFC / RFID SCANNING
+ *
+ * Requires:
+ * - Android device with NFC
+ * - Compatible browser (Chrome recommended)
+ * - HTTPS website
+ ***************************************************************/
 
-$("verificationType").addEventListener("change", function() {
-  hideResult();
-  hideStatus("mainStatus");
-  hideStatus("nfcStatus");
-  hideStatus("cameraStatus");
+async function startNFC() {
+
+  if (!("NDEFReader" in window)) {
+
+    showResult(
+      "NFC NOT SUPPORTED",
+      "Your browser or device does not support Web NFC. Use a compatible Android device with Chrome and ensure NFC is enabled.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  try {
+
+    nfcAbortController =
+      new AbortController();
+
+    nfcReader = new NDEFReader();
+
+    await nfcReader.scan({
+
+      signal: nfcAbortController.signal
+
+    });
+
+
+    nfcReader.onreading = function(event) {
+
+      let extractedID = "";
+
+      const records = event.message.records;
+
+      for (const record of records) {
+
+        try {
+
+          if (record.recordType === "text") {
+
+            const decoder = new TextDecoder(
+              record.encoding || "utf-8"
+            );
+
+            const text = decoder.decode(
+              record.data
+            );
+
+            extractedID = extractIdentifier(text);
+
+          } else if (record.recordType === "url") {
+
+            const decoder = new TextDecoder();
+
+            const text = decoder.decode(
+              record.data
+            );
+
+            extractedID = extractIdentifier(text);
+
+          } else {
+
+            const decoder = new TextDecoder();
+
+            const text = decoder.decode(
+              record.data
+            );
+
+            extractedID = extractIdentifier(text);
+
+          }
+
+        } catch (error) {
+
+          extractedID = "";
+
+        }
+
+        if (extractedID) {
+          break;
+        }
+
+      }
+
+
+      if (!extractedID) {
+
+        showResult(
+          "NO SUPPORTED ID FOUND",
+          "The NFC tag was detected, but no supported identification number could be extracted. Check whether the tag contains a student ID, employee ID, employee number, card ID, or UID.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "identifier"
+      ).value = extractedID;
+
+      stopNFC();
+
+      verifyIdentifier(extractedID);
+
+    };
+
+
+    nfcReader.onreadingerror = function() {
+
+      showResult(
+        "NFC READ ERROR",
+        "Unable to read the NFC tag. Please try scanning again.",
+        "error"
+      );
+
+    };
+
+
+    showResult(
+      "NFC READY",
+      "NFC scanning is active. Hold the identification card near the NFC reader.",
+      "complete"
+    );
+
+  } catch (error) {
+
+    showResult(
+      "NFC ERROR",
+      error.message ||
+        "Unable to start NFC scanning. Please check your device settings.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/***************************************************************
+ * 14. STOP NFC SCANNING
+ ***************************************************************/
+
+function stopNFC() {
+
+  if (nfcAbortController) {
+
+    nfcAbortController.abort();
+
+    nfcAbortController = null;
+
+  }
+
+  nfcReader = null;
+
+}
+
+
+/***************************************************************
+ * 15. START QR / BARCODE CAMERA
+ ***************************************************************/
+
+async function startCamera() {
+
+  if (html5QrCode) {
+    return;
+  }
+
+  const reader = document.getElementById(
+    "reader"
+  );
+
+  reader.style.display = "block";
+
+  html5QrCode = new Html5Qrcode(
+    "reader"
+  );
+
+  try {
+
+    await html5QrCode.start(
+
+      { facingMode: "environment" },
+
+      {
+        fps: 10,
+        qrbox: {
+          width: 250,
+          height: 150
+        }
+      },
+
+      function(decodedText) {
+
+        const id = extractIdentifier(
+          decodedText
+        );
+
+        if (!id || !isValidIdentifier(id)) {
+
+          showResult(
+            "NO SUPPORTED ID FOUND",
+            "The QR code or barcode was detected, but no valid identification number was found.",
+            "error"
+          );
+
+          return;
+
+        }
+
+        document.getElementById(
+          "identifier"
+        ).value = id;
+
+        stopCamera();
+
+        verifyIdentifier(id);
+
+      },
+
+      function(errorMessage) {
+
+        // Ignore continuous camera scanning messages.
+
+      }
+
+    );
+
+  } catch (error) {
+
+    reader.style.display = "none";
+
+    html5QrCode = null;
+
+    showResult(
+      "CAMERA ERROR",
+      "Unable to start the camera. Please allow camera access and use HTTPS.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/***************************************************************
+ * 16. STOP CAMERA
+ ***************************************************************/
+
+async function stopCamera() {
+
+  if (!html5QrCode) {
+
+    document.getElementById(
+      "reader"
+    ).style.display = "none";
+
+    return;
+
+  }
+
+  try {
+
+    if (html5QrCode.isScanning) {
+
+      await html5QrCode.stop();
+
+    }
+
+    await html5QrCode.clear();
+
+  } catch (error) {}
+
+  html5QrCode = null;
+
+  document.getElementById(
+    "reader"
+  ).style.display = "none";
+
+}
+
+
+/***************************************************************
+ * 17. CLEAR ALL
+ ***************************************************************/
+
+function clearAll() {
+
+  stopNFC();
+
+  stopCamera();
+
+  document.getElementById(
+    "identifier"
+  ).value = "";
+
+  document.getElementById(
+    "resultBox"
+  ).style.display = "none";
+
+  document.getElementById(
+    "loading"
+  ).style.display = "none";
+
+  document.getElementById(
+    "identifier"
+  ).focus();
+
+}
+
+
+/***************************************************************
+ * 18. ENTER KEY SUPPORT
+ ***************************************************************/
+
+document.getElementById(
+  "identifier"
+).addEventListener("keydown", function(event) {
+
+  if (event.key === "Enter") {
+
+    event.preventDefault();
+
+    verifyManual();
+
+  }
+
 });
 
 
-/* ============================================================
-   INITIALIZATION
-============================================================ */
+/***************************************************************
+ * 19. INITIALIZATION
+ ***************************************************************/
 
-window.addEventListener("load", function() {
-  hideResult();
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
 
-  console.log("DLSU Laguna HSU Verification System Ready.");
-});
+    console.log(
+      "DLSU Laguna HSU Verification System initialized."
+    );
+
+  }
+);
+
 </script>
 
 </body>

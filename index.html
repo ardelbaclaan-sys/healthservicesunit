@@ -343,7 +343,6 @@
     </div>
   </header>
 
-
   <!-- ANNOUNCEMENT -->
 
   <section class="announcement">
@@ -401,7 +400,6 @@
 
   </section>
 
-
   <!-- VERIFICATION TYPE -->
 
   <div class="section-title">
@@ -419,7 +417,6 @@
     </option>
 
   </select>
-
 
   <!-- CAMERA SCANNER -->
 
@@ -440,7 +437,6 @@
     STOP CAMERA
   </button>
 
-
   <!-- NFC SCANNER -->
 
   <div class="section-title">
@@ -459,10 +455,10 @@
   </button>
 
   <div class="subtitle" style="margin-top:7px">
-    NFC requires a compatible Android device, Chrome,
-    HTTPS, and a supported NDEF record.
+    NFC accepts supported NDEF records containing any
+    numeric identifier with at least 6 digits.
+    Requires compatible Android, Chrome, and HTTPS.
   </div>
-
 
   <!-- MANUAL ENTRY -->
 
@@ -481,7 +477,6 @@
     VERIFY STUDENT
   </button>
 
-
   <!-- STATUS -->
 
   <div
@@ -490,7 +485,6 @@
     role="status"
     aria-live="polite">
   </div>
-
 
   <!-- RESULT -->
 
@@ -510,7 +504,6 @@
     </div>
 
     <div id="resultId" class="student-id"></div>
-
 
     <!-- EMPLOYEE INSTRUCTION -->
 
@@ -532,7 +525,6 @@
       </div>
 
     </div>
-
 
     <!-- STUDENT FORM RECOMMENDATION -->
 
@@ -560,14 +552,12 @@
 
   </section>
 
-
   <button
     id="nextButton"
     class="hidden"
     type="button">
     SCAN NEXT
   </button>
-
 
   <!-- BROWSER REMINDER -->
 
@@ -587,7 +577,6 @@
 
   </div>
 
-
   <!-- FOOTER -->
 
   <footer class="footer">
@@ -600,7 +589,6 @@
   </footer>
 
 </main>
-
 
 <script>
 
@@ -942,7 +930,7 @@ async function startNfc() {
           .join(", ");
 
         showStatus(
-          "NFC CARD DETECTED, BUT NO SUPPORTED ID WAS EXTRACTED. " +
+          "NFC CARD DETECTED, BUT NO NUMBER WITH AT LEAST 6 DIGITS WAS FOUND. " +
           "Record type: " +
           (recordTypes || "None") +
           ". Check browser console.",
@@ -985,130 +973,96 @@ async function startNfc() {
 }
 
 
-
 /***************************************************************
- * NFC EMPLOYEE ID EXTRACTOR
+ * NFC IDENTIFIER EXTRACTOR
  *
- * ACCEPTS DIFFERENT NFC RECORD FORMATS
+ * ACCEPTS ANY NUMERIC IDENTIFIER WITH AT LEAST 6 DIGITS
+ *
+ * EXAMPLES:
+ * 123456
+ * 00123456
+ * 2026123456
+ * Employee ID: 123456
+ * Student ID: 00123456
+ * {"cardNumber":"123456"}
+ * https://example.com/id/123456
+ *
+ * PRESERVES LEADING ZEROS
  ***************************************************************/
 
 function extractIdentifierFromNdef(message) {
 
   if (!message || !message.records) return "";
 
-  const employeePatterns = [
-    /(?:Employee[\s_-]*ID)\s*[:=]\s*["']?([A-Z0-9-]+)/i,
-    /(?:Employee[\s_-]*Number)\s*[:=]\s*["']?([A-Z0-9-]+)/i,
-    /(?:I\.?D\.?[\s_-]*Number)\s*[:=]\s*["']?([A-Z0-9-]+)/i,
-    /(?:ID[\s_-]*Number)\s*[:=]\s*["']?([A-Z0-9-]+)/i,
-    /(?:ID)\s*[:=]\s*["']?([A-Z0-9-]+)/i,
-    /(?:EmployeeID|employeeId|employee_id)\s*[:=]\s*["']?([A-Z0-9-]+)/i
-  ];
-
-  function searchText(value) {
+  function findNumber(value) {
 
     if (!value) return "";
 
     const text = String(value).trim();
 
-    // Search for labelled employee identifiers.
-    for (const pattern of employeePatterns) {
+    // PRIORITIZE LABELLED IDENTIFIERS.
+    const labelledPatterns = [
+
+      /(?:Employee[\s_-]*ID|Employee[\s_-]*Number|Student[\s_-]*ID|ID[\s_-]*Number|I\.?D\.?[\s_-]*Number|Card[\s_-]*Number)\s*[:=#-]?\s*["']?(\d{6,})/i
+
+    ];
+
+    for (const pattern of labelledPatterns) {
 
       const match = text.match(pattern);
 
       if (match && match[1]) {
-        return match[1].trim();
+
+        return match[1];
+
       }
 
     }
 
-    // Search JSON-formatted NFC content.
-    try {
-
-      const json = JSON.parse(text);
-
-      if (json && typeof json === "object") {
-
-        const keys = [
-          "Employee ID",
-          "Employee_ID",
-          "EmployeeID",
-          "employeeId",
-          "employee_id",
-          "Employee Number",
-          "ID Number",
-          "ID_Number",
-          "I.D Number",
-          "ID"
-        ];
-
-        for (const key of keys) {
-
-          if (json[key] !== undefined &&
-              json[key] !== null) {
-
-            const result = String(json[key]).trim();
-
-            if (result) return result;
-
-          }
-
-        }
-
-      }
-
-    } catch (error) {
-
-      // Not JSON. Continue searching.
-    }
-
-    // Accept a plain identifier only when the entire
-    // record is a simple alphanumeric ID.
-    if (/^[A-Z0-9-]{3,30}$/i.test(text)) {
+    // ACCEPT A PLAIN NUMERIC IDENTIFIER.
+    if (/^\d{6,}$/.test(text)) {
 
       return text;
 
     }
 
-    // Search query-string formats.
+    // ACCEPT ANY NUMERIC SEQUENCE WITH AT LEAST 6 DIGITS.
+    const matches = text.match(/\d{6,}/g);
+
+    if (matches && matches.length > 0) {
+
+      return matches[0];
+
+    }
+
+    // CHECK URL PARAMETERS AND PATH.
     try {
 
       const parsed = new URL(text);
 
-      const parameters = [
-        "employeeId",
-        "employee_id",
-        "EmployeeID",
-        "Employee_ID",
-        "id",
-        "ID",
-        "employeeNumber"
-      ];
+      for (const [key, value] of parsed.searchParams.entries()) {
 
-      for (const parameter of parameters) {
+        const result = findNumber(value);
 
-        const value = parsed.searchParams.get(parameter);
-
-        if (value) return value.trim();
+        if (result) return result;
 
       }
 
-      // Check the last URL path segment.
-      const lastSegment = parsed.pathname
+      const pathSegments = parsed.pathname
         .split("/")
-        .filter(Boolean)
-        .pop();
+        .filter(Boolean);
 
-      if (lastSegment &&
-          /^[A-Z0-9-]{3,30}$/i.test(lastSegment)) {
+      for (const segment of pathSegments) {
 
-        return lastSegment;
+        const result = findNumber(segment);
+
+        if (result) return result;
 
       }
 
     } catch (error) {
 
-      // Not a URL.
+      // Not a URL. Continue.
     }
 
     return "";
@@ -1116,7 +1070,7 @@ function extractIdentifierFromNdef(message) {
   }
 
 
-  // Read every NFC record.
+  // READ EVERY NDEF RECORD.
   for (const record of message.records) {
 
     try {
@@ -1131,7 +1085,7 @@ function extractIdentifierFromNdef(message) {
 
       let decoded = "";
 
-      // NDEF TEXT RECORD
+      // NDEF TEXT RECORD.
       if (record.recordType === "text") {
 
         if (bytes.length < 1) continue;
@@ -1148,7 +1102,7 @@ function extractIdentifierFromNdef(message) {
 
       }
 
-      // NDEF URL RECORD
+      // NDEF URL RECORD.
       else if (record.recordType === "url") {
 
         if (bytes.length < 1) continue;
@@ -1169,33 +1123,23 @@ function extractIdentifierFromNdef(message) {
 
       }
 
-      // MIME TEXT RECORD
-      else if (
-        record.recordType === "mime" &&
-        record.mediaType &&
-        record.mediaType.toLowerCase().includes("text")
-      ) {
-
-        decoded = new TextDecoder().decode(bytes);
-
-      }
-
-      // EXTERNAL OR OTHER RECORDS
+      // MIME / JSON / EXTERNAL / OTHER RECORDS.
       else {
 
         decoded = new TextDecoder().decode(bytes);
 
       }
 
-      console.log("NFC Record:", record.recordType);
+      console.log("NFC Record Type:", record.recordType);
+
       console.log("NFC Content:", decoded);
 
-      const identifier = searchText(decoded);
+      const identifier = findNumber(decoded);
 
       if (identifier) {
 
         console.log(
-          "EMPLOYEE ID EXTRACTED:",
+          "NFC IDENTIFICATION NUMBER:",
           identifier
         );
 
@@ -1206,7 +1150,7 @@ function extractIdentifierFromNdef(message) {
     } catch (error) {
 
       console.warn(
-        "NFC record extraction error:",
+        "NFC extraction error:",
         error
       );
 
@@ -1217,7 +1161,6 @@ function extractIdentifierFromNdef(message) {
   return "";
 
 }
-
 
 
 /************************ STOP NFC ******************************/

@@ -103,7 +103,6 @@
       font-size: 14px;
     }
 
-    select,
     input {
       width: 100%;
       padding: 13px;
@@ -114,7 +113,6 @@
       background: white;
     }
 
-    select:focus,
     input:focus {
       border-color: var(--green);
       box-shadow: 0 0 0 2px rgba(8,120,62,.1);
@@ -201,6 +199,7 @@
       font-size: 14px;
       line-height: 1.6;
       color: var(--muted);
+      white-space: pre-line;
     }
 
     .status-complete {
@@ -222,9 +221,9 @@
     }
 
     .status-employee {
-      background: #fff5e8;
-      border-color: #f0d6a9;
-      color: #925600;
+      background: #eaf4ff;
+      border-color: #c9dff2;
+      color: #155b91;
     }
 
     .result-detail {
@@ -233,6 +232,7 @@
       border-top: 1px solid rgba(0,0,0,.1);
       font-size: 13px;
       line-height: 1.7;
+      white-space: pre-line;
       word-break: break-word;
     }
 
@@ -307,7 +307,6 @@
     <p>Academic Year 2026–2027</p>
   </div>
 
-
   <div class="content">
 
     <!-- ANNOUNCEMENT -->
@@ -316,11 +315,12 @@
 
       <strong>📢 ANNOUNCEMENT</strong>
 
-      Use this system to verify student SHWR submission
+      Use this system to verify student SHWR submissions
       or employee identification records.
 
-      Select the appropriate verification type before
-      scanning or entering an identification number.
+      Scan or enter the identification number.
+      The system will automatically search the appropriate
+      record in the HSU database.
 
       <br><br>
 
@@ -349,24 +349,7 @@
     </div>
 
 
-    <!-- VERIFICATION TYPE -->
-
-    <label for="verificationType">
-      Verification Type
-    </label>
-
-    <select id="verificationType">
-      <option value="student">
-        Student - SHWR Verification
-      </option>
-
-      <option value="employee">
-        Employee - Identification Verification
-      </option>
-    </select>
-
-
-    <!-- IDENTIFICATION NUMBER -->
+    <!-- UNIVERSAL IDENTIFICATION NUMBER -->
 
     <label for="identifier">
       Student ID / Employee ID
@@ -474,12 +457,12 @@
 
       <br>
 
-      1. Select Student or Employee verification.
+      1. Scan the identification card using NFC or camera,
+      or manually enter the identification number.
 
       <br>
 
-      2. Scan the identification card using NFC or camera,
-      or manually enter the identification number.
+      2. The system automatically searches the HSU database.
 
       <br>
 
@@ -526,7 +509,7 @@
  ***************************************************************/
 
 const API_URL =
-  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbwjdjJFejbzNy4158LsLNwVrKw1AdXDVdTaL9g6iTCwkHovPguguZYLN5XgXy9gyqc7PQ/exec";
+  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycby7fixkDAPgYaKn6zroJ-311d9-p_Q3y-jTl3CYBL6PB7pTdT2HsUEN727q1Y29bqfO3Q/exec";
 
 
 /***************************************************************
@@ -568,16 +551,6 @@ function isValidIdentifier(value) {
 
 /***************************************************************
  * 5. EXTRACT LABELLED IDENTIFICATION NUMBER
- *
- * Supports:
- * - Student ID
- * - Student Number
- * - Employee ID
- * - Employee Number
- * - Employee No
- * - Personnel Number
- * - Card ID
- * - UID
  ***************************************************************/
 
 function extractLabelledIdentifier(value) {
@@ -624,9 +597,7 @@ function extractLabelledIdentifier(value) {
 
     if (match && match[1]) {
 
-      const candidate = cleanIdentifier(
-        match[1]
-      );
+      const candidate = cleanIdentifier(match[1]);
 
       if (isValidIdentifier(candidate)) {
         return candidate;
@@ -727,15 +698,12 @@ function extractFromJSON(value) {
 
 /***************************************************************
  * 7. GENERIC IDENTIFICATION EXTRACTION
- *
- * Supports numeric and alphanumeric IDs.
  ***************************************************************/
 
 function extractGenericIdentifier(value) {
 
   const text = String(value || "").trim();
 
-  // Numeric identification number
   const numericMatches = text.match(
     /\b\d{6,30}\b/g
   );
@@ -748,7 +716,6 @@ function extractGenericIdentifier(value) {
 
   }
 
-  // Alphanumeric identification number
   const alphanumericMatches = text.match(
     /\b[A-Z0-9][A-Z0-9-]{5,39}\b/gi
   );
@@ -782,17 +749,11 @@ function extractIdentifier(value) {
     return "";
   }
 
-
-  // CHECK LABELLED IDENTIFICATION NUMBER
-
   const labelled = extractLabelledIdentifier(text);
 
   if (labelled) {
     return labelled;
   }
-
-
-  // CHECK JSON
 
   if (
     text.startsWith("{") ||
@@ -806,9 +767,6 @@ function extractIdentifier(value) {
     }
 
   }
-
-
-  // CHECK URL PARAMETERS
 
   try {
 
@@ -835,13 +793,13 @@ function extractIdentifier(value) {
 
       for (const parameter of parameters) {
 
-        const value = url.searchParams.get(
-          parameter
-        );
+        const parameterValue =
+          url.searchParams.get(parameter);
 
-        if (value) {
+        if (parameterValue) {
 
-          const candidate = cleanIdentifier(value);
+          const candidate =
+            cleanIdentifier(parameterValue);
 
           if (isValidIdentifier(candidate)) {
             return candidate;
@@ -856,16 +814,11 @@ function extractIdentifier(value) {
   } catch (error) {}
 
 
-  // CHECK RAW VALUE
-
   const direct = cleanIdentifier(text);
 
   if (isValidIdentifier(direct)) {
     return direct;
   }
-
-
-  // CHECK GENERIC PATTERNS
 
   const generic = extractGenericIdentifier(text);
 
@@ -873,9 +826,7 @@ function extractIdentifier(value) {
     generic &&
     isValidIdentifier(generic)
   ) {
-
     return generic;
-
   }
 
   return "";
@@ -889,9 +840,7 @@ function extractIdentifier(value) {
 
 function verifyManual() {
 
-  const input = document.getElementById(
-    "identifier"
-  );
+  const input = document.getElementById("identifier");
 
   const id = extractIdentifier(input.value);
 
@@ -915,7 +864,9 @@ function verifyManual() {
 
 
 /***************************************************************
- * 10. VERIFY IDENTIFICATION NUMBER
+ * 10. UNIVERSAL VERIFICATION REQUEST
+ *
+ * No Student/Employee type is sent.
  ***************************************************************/
 
 function verifyIdentifier(id) {
@@ -940,10 +891,6 @@ function verifyIdentifier(id) {
 
   isVerifying = true;
 
-  const type = document.getElementById(
-    "verificationType"
-  ).value;
-
   document.getElementById(
     "identifier"
   ).value = cleanID;
@@ -965,7 +912,6 @@ function verifyIdentifier(id) {
   const script = document.createElement("script");
 
   let completed = false;
-
   let timeout;
 
   function cleanup() {
@@ -1015,10 +961,7 @@ function verifyIdentifier(id) {
 
     }
 
-    displayVerificationResult(
-      response,
-      type
-    );
+    displayVerificationResult(response);
 
   };
 
@@ -1039,11 +982,7 @@ function verifyIdentifier(id) {
   const parameters = new URLSearchParams({
 
     action: "verify",
-
     id: cleanID,
-
-    type: type,
-
     callback: callbackName
 
   });
@@ -1066,134 +1005,136 @@ function verifyIdentifier(id) {
 
   };
 
-
   document.body.appendChild(script);
 
 }
 
 
 /***************************************************************
- * 11. DISPLAY VERIFICATION RESULT
+ * 11. DISPLAY UNIVERSAL VERIFICATION RESULT
  ***************************************************************/
 
-function displayVerificationResult(
-  response,
-  type
-) {
+function displayVerificationResult(response) {
 
   const status = String(
     response.status || ""
   ).toUpperCase();
 
-  const id = type === "employee"
-    ? response.employeeId || ""
-    : response.studentId || "";
+  const id = response.identificationNumber || "";
 
 
-  if (type === "student") {
+  /*************************************************************
+   * STUDENT WITH SHWR
+   *************************************************************/
 
-    if (status === "WITH SHWR") {
+  if (status === "WITH SHWR") {
 
-      showResult(
-        "SHWR SUBMISSION FOUND",
-        "The Student Health and Wellness Record submission has been successfully located.",
-        "complete",
-        "Student ID: " + id
-      );
+    showResult(
+      "SHWR SUBMISSION FOUND",
+      "The Student Health and Wellness Record submission has been successfully located.",
+      "complete",
+      "Identification Number: " + id
+    );
 
-      return;
-
-    }
-
-
-    if (status === "NO SHWR") {
-
-      showResult(
-        "NO SHWR SUBMISSION",
-        response.message ||
-          "No SHWR submission was found.",
-        "missing",
-        "Student ID: " + id +
-        (
-          response.gradeLevel
-            ? "\nGrade Level: " + response.gradeLevel
-            : ""
-        )
-      );
-
-
-      // DISPLAY APPROPRIATE FORM
-
-      if (response.formUrl) {
-
-        const container = document.getElementById(
-          "formContainer"
-        );
-
-        const link = document.createElement("a");
-
-        link.href = response.formUrl;
-
-        link.target = "_blank";
-
-        link.rel = "noopener noreferrer";
-
-        link.className = "form-link";
-
-        link.textContent =
-          "OPEN " +
-          (response.formType || "SHWR") +
-          " SUBMISSION FORM";
-
-        container.appendChild(link);
-
-      }
-
-      return;
-
-    }
+    return;
 
   }
 
 
-  if (type === "employee") {
+  /*************************************************************
+   * STUDENT WITHOUT SHWR
+   *************************************************************/
 
-    if (status === "VERIFIED") {
+  if (status === "NO SHWR") {
 
-      showResult(
-        "EMPLOYEE RECORD FOUND",
-        "An employee identification record was found. Please coordinate with the Health Services Unit for clearance verification.",
-        "employee",
-        "Employee ID: " + id +
-        "\nStatus: NOT CLEARED"
+    showResult(
+      "NO SHWR SUBMISSION",
+      response.message ||
+        "Student record found, but no SHWR submission was located.",
+      "missing",
+
+      "Identification Number: " + id +
+      (
+        response.gradeLevel
+          ? "\nGrade Level: " + response.gradeLevel
+          : ""
+      )
+    );
+
+
+    if (response.formUrl) {
+
+      const container = document.getElementById(
+        "formContainer"
       );
 
-      return;
+      const link = document.createElement("a");
+
+      link.href = response.formUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.className = "form-link";
+
+      link.textContent =
+        "OPEN " +
+        (response.formType || "SHWR") +
+        " SUBMISSION FORM";
+
+      container.appendChild(link);
 
     }
 
-
-    if (status === "NOT FOUND") {
-
-      showResult(
-        "NO OUTSTANDING RECORD FOUND",
-        "No matching employee identification record was found in the verification database.",
-        "complete",
-        "Employee ID: " + id +
-        "\nStatus: CLEARED"
-      );
-
-      return;
-
-    }
+    return;
 
   }
 
+
+  /*************************************************************
+   * EMPLOYEE RECORD FOUND
+   *************************************************************/
+
+  if (status === "EMPLOYEE FOUND") {
+
+    showResult(
+      "EMPLOYEE RECORD FOUND",
+      "An employee identification record was found in the HSU database. Please coordinate with the Health Services Unit for any applicable clearance verification.",
+      "employee",
+      "Identification Number: " + id
+    );
+
+    return;
+
+  }
+
+
+  /*************************************************************
+   * NO MATCHING RECORD
+   *************************************************************/
+
+  if (status === "NOT FOUND") {
+
+    showResult(
+      "NO MATCHING RECORD FOUND",
+      response.message ||
+        "No matching identification number was found.",
+      "error",
+      "Identification Number: " + id
+    );
+
+    return;
+
+  }
+
+
+  /*************************************************************
+   * UNKNOWN RESPONSE
+   *************************************************************/
 
   showResult(
     status || "UNKNOWN STATUS",
     response.message || "Verification completed.",
-    "error"
+    "error",
+    "Identification Number: " + id
   );
 
 }
@@ -1210,25 +1151,15 @@ function showResult(
   detail
 ) {
 
-  const box = document.getElementById(
-    "resultBox"
-  );
+  const box = document.getElementById("resultBox");
 
-  const titleElement = document.getElementById(
-    "resultTitle"
-  );
+  const titleElement = document.getElementById("resultTitle");
 
-  const messageElement = document.getElementById(
-    "resultMessage"
-  );
+  const messageElement = document.getElementById("resultMessage");
 
-  const detailElement = document.getElementById(
-    "resultDetail"
-  );
+  const detailElement = document.getElementById("resultDetail");
 
-  const formContainer = document.getElementById(
-    "formContainer"
-  );
+  const formContainer = document.getElementById("formContainer");
 
 
   box.className = "status-box";
@@ -1269,8 +1200,8 @@ function showResult(
  * 13. NFC / RFID SCANNING
  *
  * Requires:
- * - Android device with NFC
- * - Compatible browser (Chrome recommended)
+ * - Compatible Android device
+ * - Chrome browser with Web NFC support
  * - HTTPS website
  ***************************************************************/
 
@@ -1290,15 +1221,14 @@ async function startNFC() {
 
   try {
 
-    nfcAbortController =
-      new AbortController();
+    stopNFC();
+
+    nfcAbortController = new AbortController();
 
     nfcReader = new NDEFReader();
 
     await nfcReader.scan({
-
       signal: nfcAbortController.signal
-
     });
 
 
@@ -1318,9 +1248,7 @@ async function startNFC() {
               record.encoding || "utf-8"
             );
 
-            const text = decoder.decode(
-              record.data
-            );
+            const text = decoder.decode(record.data);
 
             extractedID = extractIdentifier(text);
 
@@ -1328,9 +1256,7 @@ async function startNFC() {
 
             const decoder = new TextDecoder();
 
-            const text = decoder.decode(
-              record.data
-            );
+            const text = decoder.decode(record.data);
 
             extractedID = extractIdentifier(text);
 
@@ -1338,9 +1264,7 @@ async function startNFC() {
 
             const decoder = new TextDecoder();
 
-            const text = decoder.decode(
-              record.data
-            );
+            const text = decoder.decode(record.data);
 
             extractedID = extractIdentifier(text);
 
@@ -1363,7 +1287,7 @@ async function startNFC() {
 
         showResult(
           "NO SUPPORTED ID FOUND",
-          "The NFC tag was detected, but no supported identification number could be extracted. Check whether the tag contains a student ID, employee ID, employee number, card ID, or UID.",
+          "The NFC tag was detected, but no supported identification number could be extracted. The tag may contain only a card UID or use a format that Web NFC cannot read.",
           "error"
         );
 
@@ -1443,15 +1367,11 @@ async function startCamera() {
     return;
   }
 
-  const reader = document.getElementById(
-    "reader"
-  );
+  const reader = document.getElementById("reader");
 
   reader.style.display = "block";
 
-  html5QrCode = new Html5Qrcode(
-    "reader"
-  );
+  html5QrCode = new Html5Qrcode("reader");
 
   try {
 
@@ -1469,9 +1389,7 @@ async function startCamera() {
 
       function(decodedText) {
 
-        const id = extractIdentifier(
-          decodedText
-        );
+        const id = extractIdentifier(decodedText);
 
         if (!id || !isValidIdentifier(id)) {
 
@@ -1539,9 +1457,7 @@ async function stopCamera() {
   try {
 
     if (html5QrCode.isScanning) {
-
       await html5QrCode.stop();
-
     }
 
     await html5QrCode.clear();
@@ -1614,7 +1530,7 @@ document.addEventListener(
   function() {
 
     console.log(
-      "DLSU Laguna HSU Verification System initialized."
+      "DLSU Laguna HSU Universal Verification System initialized."
     );
 
   }

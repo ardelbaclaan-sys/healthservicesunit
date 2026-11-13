@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08783e">
+  <title>DLSU Laguna | SHWR Verification</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;padding:14px;background:#f2f4f7;font-family:Arial,Helvetica,sans-serif;color:#222}
+    .container{width:100%;max-width:520px;margin:18px auto;padding:22px;background:#fff;border-radius:15px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+    .header{text-align:center}.university{color:#08783e;font-size:17px;font-weight:bold}
+    .unit{margin-top:5px;font-size:13px;font-weight:bold;color:#555}
+    h1{margin:19px 0 5px;color:#08783e;font-size:23px}
+    .subtitle{font-size:13px;color:#666;line-height:1.5}
+    .announcement{margin:20px 0;padding:14px;background:#f0f7f2;border-left:4px solid #08783e;border-radius:6px;font-size:13px;line-height:1.5}
+    .announcement strong{color:#08783e}
+    .section-title{margin:20px 0 10px;font-size:14px;font-weight:bold}
+    #reader{width:100%;min-height:90px;overflow:hidden;border:2px dashed #b8c8bd;border-radius:10px;background:#fafafa}
+    #reader video{width:100%!important;border-radius:8px}
+    input{width:100%;padding:15px;margin-top:8px;border:1px solid #ccc;border-radius:8px;font-size:18px;text-align:center}
+    input:focus{outline:none;border-color:#08783e}
+    button{width:100%;padding:14px;margin-top:10px;border:0;border-radius:8px;background:#08783e;color:#fff;font-size:14px;font-weight:bold;cursor:pointer}
+    button:disabled{background:#999;cursor:not-allowed}
+    .secondary{background:#555}.hidden{display:none!important}
+    .status{display:none;margin-top:15px;padding:12px;border-radius:8px;font-size:13px;line-height:1.5;text-align:center;overflow-wrap:anywhere}
+    .status.info{display:block;background:#e8f1ff;color:#174b83}
+    .status.success{display:block;background:#e6f5eb;color:#08783e}
+    .status.error{display:block;background:#fdeaea;color:#a51d1d}
+    .result{display:none;margin-top:20px;padding:24px 15px;border-radius:12px;text-align:center}
+    .with-shwr{background:#e5f5eb;border:2px solid #168346}
+    .no-shwr{background:#fff0f0;border:2px solid #c62828}
+    .error-result{background:#fff5e5;border:2px solid #d18a00}
+    .result-label{color:#555;font-size:12px;font-weight:bold;letter-spacing:.4px}
+    .result-status{margin:12px 0;font-size:28px;font-weight:bold;overflow-wrap:anywhere}
+    .with-shwr .result-status{color:#08783e}.no-shwr .result-status{color:#c62828}
+    .error-result .result-status{color:#a56800;font-size:22px}
+    .student-id{margin-top:10px;font-size:20px;font-weight:bold;color:#333;overflow-wrap:anywhere}
+    .browser-note{margin-top:22px;padding:13px;background:#fff8e6;border-left:4px solid #d69e00;border-radius:6px;color:#755500;font-size:12px;line-height:1.5;text-align:center}
+    .footer{margin-top:22px;color:#888;font-size:11px;line-height:1.5;text-align:center}
+    @media(max-width:480px){body{padding:8px}.container{margin:8px auto;padding:18px}h1{font-size:20px}}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <div class="university">DE LA SALLE UNIVERSITY</div>
+      <div class="unit">LAGUNA CAMPUS<br>HEALTH SERVICES UNIT</div>
+      <h1>SHWR VERIFICATION</h1>
+      <div class="subtitle">Student Health and Wellness Record<br>Academic Year 2026–2027</div>
+    </header>
+
+    <section class="announcement">
+      <strong>ANNOUNCEMENT</strong>
+      <p>All OLD and NEW students for Academic Year 2026–2027, particularly Grade 11 and Grade 12 Senior High School students, are required to accomplish and submit the Student Health and Wellness Record (SHWR).</p>
+      <p>Scan your Student ID or enter the Student ID number to verify SHWR submission.</p>
+    </section>
+
+    <div class="section-title">1. QR CODE / BARCODE SCANNER</div>
+    <div id="reader"></div>
+    <button id="startCameraButton" type="button">START CAMERA SCANNER</button>
+    <button id="stopCameraButton" class="secondary hidden" type="button">STOP CAMERA</button>
+
+    <div class="section-title">2. NFC SCANNER (SUPPORTED ANDROID DEVICES)</div>
+    <button id="startNfcButton" type="button">SCAN NFC CARD</button>
+    <button id="stopNfcButton" class="secondary hidden" type="button">STOP NFC SCANNING</button>
+    <div class="subtitle" style="margin-top:7px">NFC requires Android Chrome, HTTPS, and a card containing a supported NDEF record with the Student ID.</div>
+
+    <div class="section-title">3. MANUAL STUDENT ID ENTRY</div>
+    <input id="studentIdInput" type="text" placeholder="Enter Student ID Number" autocomplete="off" autocapitalize="characters">
+    <button id="verifyButton" type="button">VERIFY STUDENT</button>
+
+    <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+
+    <section id="resultBox" class="result" aria-live="polite">
+      <div class="result-label">SHWR VERIFICATION RESULT</div>
+      <div id="resultStatus" class="result-status"></div>
+      <div class="result-label">STUDENT ID</div>
+      <div id="resultStudentId" class="student-id"></div>
+    </section>
+
+    <button id="nextButton" class="hidden" type="button">SCAN NEXT STUDENT</button>
+
+    <div class="browser-note">
+      <strong>IMPORTANT REMINDER</strong>
+      <p>Use Google Chrome on Android for NFC scanning. Allow camera access when using the camera scanner.</p>
+      <p>NFC scanning works only if the card provides a supported NDEF record. Reading a card's MIFARE hardware UID is not supported by standard Web NFC.</p>
+    </div>
+
+    <footer class="footer">
+      DE LA SALLE UNIVERSITY - LAGUNA CAMPUS<br>
+      HEALTH SERVICES UNIT<br>
+      STUDENT HEALTH AND WELLNESS RECORD<br>
+      ACADEMIC YEAR 2026–2027
+    </footer>
+  </main>
+
+<script>
+/****************************************************************
+ * GOOGLE APPS SCRIPT JSONP API
+ * Keep this URL if it is still your active deployed Web App URL.
+ ****************************************************************/
+const SHWR_API_URL =
+  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbyENnIcoXVGMLq2q1hlkuvBhLapg0ZP_LeAarvQY0gNLBs_RuczNxJuzPDGTfDcA_x2ag/exec";
+
+let qrScanner = null;
+let cameraRunning = false;
+let nfcReader = null;
+let nfcAbortController = null;
+let isProcessing = false;
+
+const $ = id => document.getElementById(id);
+
+window.addEventListener("load", () => {
+  showStatus("SHWR Verification System is ready.", "success");
+  $("startNfcButton").disabled = !("NDEFReader" in window);
+  if (!("NDEFReader" in window)) {
+    $("startNfcButton").title = "Web NFC is not supported by this browser.";
+  }
+});
+
+function normalizeStudentId(value) {
+  return String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+/*********************** CAMERA QR/BARCODE ************************/
+async function startCamera() {
+  if (isProcessing || cameraRunning) return;
+
+  $("startCameraButton").disabled = true;
+  try {
+    if (!window.Html5Qrcode) {
+      throw new Error("Scanner library did not load. Check your internet connection.");
+    }
+    showStatus("Starting camera. Allow camera access when prompted.", "info");
+    if (!qrScanner) qrScanner = new Html5Qrcode("reader");
+
+    const config = { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
+    try {
+      await qrScanner.start({ facingMode: "environment" }, config, onQrDecoded, () => {});
+    } catch (rearError) {
+      await qrScanner.start({ facingMode: "user" }, config, onQrDecoded, () => {});
+    }
+
+    cameraRunning = true;
+    $("startCameraButton").classList.add("hidden");
+    $("stopCameraButton").classList.remove("hidden");
+    showStatus("Camera scanner is ready. Position the code inside the frame.", "success");
+  } catch (error) {
+    $("startCameraButton").disabled = false;
+    showStatus("CAMERA ERROR: " + (error.message || error), "error");
+  }
+}
+
+async function stopCamera() {
+  try {
+    if (qrScanner && cameraRunning) await qrScanner.stop();
+  } catch (error) {
+    console.warn("Camera stop:", error);
+  }
+  cameraRunning = false;
+  $("startCameraButton").classList.remove("hidden");
+  $("startCameraButton").disabled = false;
+  $("stopCameraButton").classList.add("hidden");
+}
+
+async function onQrDecoded(decodedText) {
+  if (isProcessing || !decodedText) return;
+  await stopCamera();
+  verifyStudentId(decodedText);
+}
+
+/***************************** NFC *********************************
+ * Web NFC reads supported NDEF records, not arbitrary MIFARE UIDs.
+ * Expected card content: an NDEF Text record containing the Student ID.
+ ******************************************************************/
+async function startNfc() {
+  if (isProcessing || nfcReader) return;
+  if (!("NDEFReader" in window)) {
+    showStatus("NFC is not supported in this browser. Use compatible Android Chrome over HTTPS.", "error");
+    return;
+  }
+
+  try {
+    nfcReader = new NDEFReader();
+    nfcAbortController = new AbortController();
+    await nfcReader.scan({ signal: nfcAbortController.signal });
+
+    $("startNfcButton").classList.add("hidden");
+    $("stopNfcButton").classList.remove("hidden");
+    showStatus("NFC is ready. Hold the supported NFC card near the phone.", "success");
+
+    nfcReader.onreading = event => {
+      if (isProcessing) return;
+      const studentId = extractStudentIdFromNdef(event.message);
+      if (!studentId) {
+        showStatus("No Student ID text record was found on this NFC card.", "error");
+        return;
+      }
+      stopNfc();
+      verifyStudentId(studentId);
+    };
+
+    nfcReader.onreadingerror = () => {
+      showStatus("Could not read this NFC tag. Check that it contains a supported NDEF record.", "error");
+    };
+  } catch (error) {
+    stopNfc();
+    showStatus("NFC ERROR: " + (error.message || error), "error");
+  }
+}
+
+function extractStudentIdFromNdef(message) {
+  for (const record of message.records) {
+    try {
+      if (record.recordType === "text") {
+        const decoder = new TextDecoder(record.encoding || "utf-8");
+        const value = decoder.decode(record.data).trim();
+        if (value) return value;
+      }
+      if (record.recordType === "url") {
+        const decoder = new TextDecoder();
+        const value = decoder.decode(record.data).trim();
+        if (value) return value;
+      }
+    } catch (error) {
+      console.warn("NDEF record could not be decoded.");
+    }
+  }
+  return "";
+}
+
+function stopNfc() {
+  try {
+    if (nfcAbortController) nfcAbortController.abort();
+  } catch (error) {
+    console.warn("NFC stop:", error);
+  }
+  nfcReader = null;
+  nfcAbortController = null;
+  $("startNfcButton").classList.remove("hidden");
+  $("stopNfcButton").classList.add("hidden");
+}
+
+/************************ MANUAL ENTRY *****************************/
+function verifyManual() {
+  if (isProcessing) return;
+  const id = $("studentIdInput").value.trim();
+  if (!id) {
+    showStatus("Please enter a Student ID number.", "error");
+    return;
+  }
+  verifyStudentId(id);
+}
+
+$("studentIdInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") verifyManual();
+});
+
+/************************ JSONP VERIFICATION ***********************/
+function verifyStudentId(rawStudentId) {
+  const studentId = normalizeStudentId(rawStudentId);
+  if (!studentId) {
+    showStatus("Invalid Student ID.", "error");
+    return;
+  }
+
+  isProcessing = true;
+  $("verifyButton").disabled = true;
+  $("resultBox").style.display = "none";
+  $("nextButton").classList.add("hidden");
+  showStatus("Checking SHWR records...", "info");
+
+  const callbackName = "shwrCallback_" + Date.now() + "_" +
+    Math.floor(Math.random() * 100000);
+  const script = document.createElement("script");
+  let completed = false;
+  let timeoutId;
+
+  function cleanup() {
+    if (completed) return;
+    completed = true;
+    clearTimeout(timeoutId);
+    delete window[callbackName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    $("verifyButton").disabled = false;
+    isProcessing = false;
+  }
+
+  function fail(message) {
+    if (completed) return;
+    cleanup();
+    showResult("ERROR", studentId, "error-result");
+    showStatus(message, "error");
+  }
+
+  window[callbackName] = response => {
+    if (completed) return;
+    cleanup();
+
+    if (!response || response.success !== true) {
+      showResult("ERROR", studentId, "error-result");
+      showStatus((response && response.message) || "Verification failed.", "error");
+      return;
+    }
+
+    if (response.status === "WITH SHWR") {
+      showResult("WITH SHWR", response.studentId || studentId, "with-shwr");
+      showStatus("Verification completed.", "success");
+    } else if (response.status === "NO SHWR") {
+      showResult("NO SHWR", response.studentId || studentId, "no-shwr");
+      showStatus("Verification completed.", "success");
+    } else {
+      showResult("ERROR", response.studentId || studentId, "error-result");
+      showStatus(response.message || "Unexpected server response.", "error");
+    }
+  };
+
+  script.onerror = () => fail("Unable to connect to the SHWR API. Check the deployment URL, permissions, and internet connection.");
+  timeoutId = setTimeout(() => fail("Server timeout. Please try again."), 15000);
+
+  const query = "?action=verify&id=" + encodeURIComponent(studentId) +
+    "&callback=" + encodeURIComponent(callbackName) +
+    "&_=" + Date.now();
+  script.src = SHWR_API_URL + query;
+  document.head.appendChild(script);
+}
+
+/************************ DISPLAY RESULT ***************************/
+function showResult(status, studentId, resultClass) {
+  $("resultBox").className = "result " + resultClass;
+  $("resultStatus").textContent = status;
+  $("resultStudentId").textContent = studentId;
+  $("resultBox").style.display = "block";
+  $("nextButton").classList.remove("hidden");
+}
+
+function showStatus(message, type) {
+  const box = $("statusMessage");
+  box.textContent = message;
+  box.className = "status " + type;
+}
+
+/************************ RESET FOR NEXT STUDENT *******************/
+async function resetApp() {
+  await stopCamera();
+  stopNfc();
+  isProcessing = false;
+  $("studentIdInput").value = "";
+  $("resultBox").style.display = "none";
+  $("resultBox").className = "result";
+  $("nextButton").classList.add("hidden");
+  $("verifyButton").disabled = false;
+  showStatus("Ready for the next student.", "success");
+  $("studentIdInput").focus();
+}
+
+/************************ BUTTON EVENTS ****************************/
+$("startCameraButton").addEventListener("click", startCamera);
+$("stopCameraButton").addEventListener("click", stopCamera);
+$("startNfcButton").addEventListener("click", startNfc);
+$("stopNfcButton").addEventListener("click", stopNfc);
+$("verifyButton").addEventListener("click", verifyManual);
+$("nextButton").addEventListener("click", resetApp);
+</script>
+</body>
+</html>

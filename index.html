@@ -474,6 +474,15 @@
 
       <br><br>
 
+      <b>NFC Compatibility:</b>
+
+      This system reads supported NDEF-formatted NFC cards,
+      including compatible MIFARE cards. Protected MIFARE
+      sectors and non-NDEF card data may require a dedicated
+      Android application or reader.
+
+      <br><br>
+
       <b>Privacy Notice:</b>
 
       This system is intended for identification and
@@ -502,7 +511,6 @@
 </div>
 
 
-
 <script>
 
 /***************************************************************
@@ -510,7 +518,7 @@
  ***************************************************************/
 
 const API_URL =
-  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbx_QN14KwGxP2NeYOH1Ibm9JDANYwgiSYoGWZ8iYAuZg4pM_-T1yVd3B_7wy1-nDUpSzw/exec";
+  "https://script.google.com/a/macros/dlsu.edu.ph/s/AKfycbz_VGe0Vk8uQB--5wQ4M61yE-p1SkW3O23-GYNtWIyeIb32fJHBMKM_pWlrEvRVOZ9kCg/exec";
 
 
 /***************************************************************
@@ -571,12 +579,16 @@ function extractLabelledIdentifier(value) {
     "personnel id",
     "student id",
     "student number",
+    "student no",
     "studentid",
     "studentnumber",
     "identification number",
     "identification no",
     "id number",
     "id no",
+    "dlsu id",
+    "dlsu id number",
+    "dlsu identification number",
     "card id",
     "card number",
     "card no",
@@ -635,8 +647,8 @@ function extractFromJSON(value) {
       const keys = [
         "employeeid",
         "employee_id",
-        "employee number",
         "employeenumber",
+        "employee_number",
         "personnelnumber",
         "personnel_id",
         "studentid",
@@ -645,6 +657,8 @@ function extractFromJSON(value) {
         "student_number",
         "idnumber",
         "id_number",
+        "dlsuid",
+        "dlsu_id",
         "cardid",
         "card_id",
         "uid",
@@ -667,20 +681,6 @@ function extractFromJSON(value) {
               return candidate;
             }
 
-          }
-
-        }
-
-      }
-
-      for (const item of Object.values(data)) {
-
-        if (typeof item === "string") {
-
-          const result = extractIdentifier(item);
-
-          if (result) {
-            return result;
           }
 
         }
@@ -713,9 +713,7 @@ function extractGenericIdentifier(value) {
   );
 
   if (numericMatches && numericMatches.length) {
-
     return cleanIdentifier(numericMatches[0]);
-
   }
 
   const alphanumericMatches = text.match(
@@ -723,9 +721,7 @@ function extractGenericIdentifier(value) {
   );
 
   if (alphanumericMatches && alphanumericMatches.length) {
-
     return cleanIdentifier(alphanumericMatches[0]);
-
   }
 
   return "";
@@ -786,6 +782,8 @@ function extractIdentifier(value) {
         "student_id",
         "studentnumber",
         "student_number",
+        "dlsuid",
+        "dlsu_id",
         "id",
         "uid",
         "cardid"
@@ -808,6 +806,10 @@ function extractIdentifier(value) {
         }
 
       }
+
+      return extractLabelledIdentifier(
+        url.pathname
+      );
 
     }
 
@@ -959,11 +961,6 @@ function verifyIdentifier(id) {
 
   let completed = false;
 
-
-  /*************************************************************
-   * SUCCESSFUL JSONP CALLBACK
-   *************************************************************/
-
   window[callbackName] = function(response) {
 
     if (completed) {
@@ -1003,10 +1000,6 @@ function verifyIdentifier(id) {
   };
 
 
-  /*************************************************************
-   * REQUEST TIMEOUT
-   *************************************************************/
-
   activeJSONPTimeout = setTimeout(function() {
 
     if (completed) {
@@ -1026,10 +1019,6 @@ function verifyIdentifier(id) {
   }, 20000);
 
 
-  /*************************************************************
-   * BUILD JSONP URL
-   *************************************************************/
-
   const parameters = new URLSearchParams({
 
     action: "verify",
@@ -1044,11 +1033,6 @@ function verifyIdentifier(id) {
     API_URL +
     "?" +
     parameters.toString();
-
-
-  /*************************************************************
-   * SCRIPT LOADING ERROR
-   *************************************************************/
 
   script.onerror = function() {
 
@@ -1068,11 +1052,6 @@ function verifyIdentifier(id) {
 
   };
 
-
-  /*************************************************************
-   * SEND REQUEST
-   *************************************************************/
-
   document.body.appendChild(script);
 
 }
@@ -1090,7 +1069,6 @@ function displayVerificationResult(response) {
 
   const id = response.identificationNumber || "";
 
-
   if (status === "WITH SHWR") {
 
     showResult(
@@ -1103,7 +1081,6 @@ function displayVerificationResult(response) {
     return;
 
   }
-
 
   if (status === "NO SHWR") {
 
@@ -1119,7 +1096,6 @@ function displayVerificationResult(response) {
 
   }
 
-
   if (status === "NO RECORDS") {
 
     showResult(
@@ -1132,7 +1108,6 @@ function displayVerificationResult(response) {
     return;
 
   }
-
 
   if (status === "EMPLOYEE FOUND") {
 
@@ -1147,7 +1122,6 @@ function displayVerificationResult(response) {
 
   }
 
-
   if (status === "NOT FOUND") {
 
     showResult(
@@ -1160,7 +1134,6 @@ function displayVerificationResult(response) {
     return;
 
   }
-
 
   showResult(
     status || "UNKNOWN STATUS",
@@ -1193,7 +1166,6 @@ function showResult(
 
   const formContainer = document.getElementById("formContainer");
 
-
   box.className = "status-box";
 
   if (statusType === "complete") {
@@ -1214,7 +1186,6 @@ function showResult(
 
   }
 
-
   titleElement.textContent = title;
 
   messageElement.textContent = message;
@@ -1223,22 +1194,194 @@ function showResult(
 
   formContainer.replaceChildren();
 
+  /*************************************************************
+   * SHOW SHWR SUBMISSION FORM LINKS WHEN MISSING
+   *************************************************************/
+
+  if (statusType === "missing") {
+
+    const heading = document.createElement("p");
+
+    heading.textContent =
+      "Please use the appropriate SHWR submission form:";
+
+    formContainer.appendChild(heading);
+
+    const forms = [
+      {
+        label: "Nursery to Grade 10 SHWR Form",
+        url: "https://docs.google.com/forms/d/e/1FAIpQLSfbll3hXaCLblPbklP8bSIrNChTAdqzs_FdGpK5zGx9KR57DQ/viewform"
+      },
+      {
+        label: "Grade 11 to Grade 12 SHWR Form",
+        url: "https://docs.google.com/forms/d/e/1FAIpQLSe2NlxFvTF04m56fCnk6kyRcrMkCeBfggyf1F_H7w48LW_M9Q/viewform"
+      }
+    ];
+
+    forms.forEach(function(item) {
+
+      const link = document.createElement("a");
+
+      link.href = item.url;
+
+      link.target = "_blank";
+
+      link.rel = "noopener noreferrer";
+
+      link.className = "form-link";
+
+      link.textContent = item.label;
+
+      formContainer.appendChild(link);
+
+    });
+
+  }
+
   box.style.display = "block";
 
 }
 
 
 /***************************************************************
- * 14. NFC / RFID SCANNING
+ * 14. NFC RECORD DECODER
+ ***************************************************************/
+
+function decodeNFCRecord(record) {
+
+  try {
+
+    const decoder = new TextDecoder(
+      record.encoding || "utf-8"
+    );
+
+    return decoder.decode(record.data);
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+
+/***************************************************************
+ * 15. EXTRACT ID FROM NFC RECORD
+ ***************************************************************/
+
+function extractNFCRecord(record) {
+
+  const recordType = String(
+    record.recordType || ""
+  ).toLowerCase();
+
+  const supportedTypes = [
+    "text",
+    "url",
+    "mime",
+    "absolute-url"
+  ];
+
+  if (!supportedTypes.includes(recordType)) {
+    return "";
+  }
+
+  const decoded = decodeNFCRecord(record);
+
+  if (!decoded) {
+    return "";
+  }
+
+  let result = extractIdentifier(decoded);
+
+  if (result) {
+    return result;
+  }
+
+  if (
+    recordType === "mime" &&
+    /json|text/i.test(record.mediaType || "")
+  ) {
+
+    result = extractFromJSON(decoded);
+
+    if (result) {
+      return result;
+    }
+
+  }
+
+  return "";
+
+}
+
+
+/***************************************************************
+ * 16. EXTRACT ID FROM ALL NFC RECORDS
+ ***************************************************************/
+
+function extractNFCIdentifier(message) {
+
+  if (
+    !message ||
+    !message.records ||
+    !message.records.length
+  ) {
+    return "";
+  }
+
+  for (const record of message.records) {
+
+    const id = extractNFCRecord(record);
+
+    if (id && isValidIdentifier(id)) {
+      return id;
+    }
+
+  }
+
+  return "";
+
+}
+
+
+/***************************************************************
+ * 17. NFC / MIFARE SCANNING
+ *
+ * Android Chrome + Web NFC
+ *
+ * Supported:
+ * - NDEF text records
+ * - NDEF URI records
+ * - NDEF JSON MIME records
+ * - Compatible NDEF-formatted MIFARE cards
+ *
+ * Not supported directly:
+ * - Raw MIFARE Classic sectors
+ * - Protected DESFire applications
+ * - Arbitrary hardware UID extraction
  ***************************************************************/
 
 async function startNFC() {
+
+  if (!window.isSecureContext) {
+
+    showResult(
+      "HTTPS REQUIRED",
+      "NFC scanning requires a secure HTTPS connection. Open the HSU website using its HTTPS address.",
+      "error"
+    );
+
+    return;
+
+  }
 
   if (!("NDEFReader" in window)) {
 
     showResult(
       "NFC NOT SUPPORTED",
-      "Your browser or device does not support Web NFC. Use a compatible Android device with Chrome and ensure NFC is enabled.",
+      "Web NFC is unavailable. Use a compatible Android phone with Chrome and enable NFC in Android settings.",
       "error"
     );
 
@@ -1258,103 +1401,59 @@ async function startNFC() {
       signal: nfcAbortController.signal
     });
 
+    showResult(
+      "NFC READY",
+      "NFC scanning is active. Hold your DLSU identification card near the NFC sensor.",
+      "complete"
+    );
 
     nfcReader.onreading = function(event) {
 
-      let extractedID = "";
+      const id = extractNFCIdentifier(
+        event.message
+      );
 
-      for (const record of event.message.records) {
-
-        try {
-
-          if (record.recordType === "text") {
-
-            const decoder = new TextDecoder(
-              record.encoding || "utf-8"
-            );
-
-            extractedID = extractIdentifier(
-              decoder.decode(record.data)
-            );
-
-          } else if (record.recordType === "url") {
-
-            const decoder = new TextDecoder();
-
-            extractedID = extractIdentifier(
-              decoder.decode(record.data)
-            );
-
-          } else {
-
-            const decoder = new TextDecoder();
-
-            extractedID = extractIdentifier(
-              decoder.decode(record.data)
-            );
-
-          }
-
-        } catch (error) {
-
-          extractedID = "";
-
-        }
-
-        if (extractedID) {
-          break;
-        }
-
-      }
-
-
-      if (!extractedID) {
+      if (!id) {
 
         showResult(
-          "NO SUPPORTED ID FOUND",
-          "The NFC tag was detected, but no supported identification number could be extracted. Standard Web NFC cannot directly read every RFID card's hardware UID.",
-          "error"
+          "CARD DETECTED - NO SUPPORTED ID",
+          "The NFC card was detected, but no supported DLSU identification number was found in its readable NDEF records. The card may use protected MIFARE data or a non-NDEF format.",
+          "error",
+          "A card hardware UID is not automatically treated as an identification number."
         );
 
         return;
 
       }
 
-
       document.getElementById(
         "identifier"
-      ).value = extractedID;
+      ).value = id;
 
       stopNFC();
 
-      verifyIdentifier(extractedID);
+      verifyIdentifier(id);
 
     };
-
 
     nfcReader.onreadingerror = function() {
 
       showResult(
         "NFC READ ERROR",
-        "Unable to read the NFC tag. Please try again.",
+        "The NFC card could not be read. Check the card position and try again.",
         "error"
       );
 
     };
 
-
-    showResult(
-      "NFC READY",
-      "NFC scanning is active. Hold the identification card near the NFC reader.",
-      "complete"
-    );
-
   } catch (error) {
+
+    stopNFC();
 
     showResult(
       "NFC ERROR",
       error.message ||
-        "Unable to start NFC scanning.",
+        "Unable to start NFC scanning. Check NFC settings and browser permissions.",
       "error"
     );
 
@@ -1364,7 +1463,7 @@ async function startNFC() {
 
 
 /***************************************************************
- * 15. STOP NFC
+ * 18. STOP NFC
  ***************************************************************/
 
 function stopNFC() {
@@ -1383,7 +1482,7 @@ function stopNFC() {
 
 
 /***************************************************************
- * 16. START QR / BARCODE CAMERA
+ * 19. START QR / BARCODE CAMERA
  ***************************************************************/
 
 async function startCamera() {
@@ -1460,7 +1559,7 @@ async function startCamera() {
 
 
 /***************************************************************
- * 17. STOP CAMERA
+ * 20. STOP CAMERA
  ***************************************************************/
 
 async function stopCamera() {
@@ -1495,7 +1594,7 @@ async function stopCamera() {
 
 
 /***************************************************************
- * 18. CLEAR ALL
+ * 21. CLEAR ALL
  ***************************************************************/
 
 function clearAll() {
@@ -1526,7 +1625,7 @@ function clearAll() {
 
 
 /***************************************************************
- * 19. ENTER KEY SUPPORT
+ * 22. ENTER KEY SUPPORT
  ***************************************************************/
 
 document.getElementById(
@@ -1545,7 +1644,7 @@ document.getElementById(
 
 
 /***************************************************************
- * 20. INITIALIZATION
+ * 23. INITIALIZATION
  ***************************************************************/
 
 console.log(
@@ -1557,8 +1656,14 @@ console.log(
   API_URL
 );
 
-</script>
+console.log(
+  "NFC support:",
+  "NDEFReader" in window
+    ? "Available"
+    : "Unavailable"
+);
 
+</script>
 
 </body>
 </html>
